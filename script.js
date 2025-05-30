@@ -1,3 +1,5 @@
+
+
 let mockAnimes = [
             // IDs para os animes da imagem image_324b16.png
             { id: 3588, title: "Soul Eater" },
@@ -16,8 +18,6 @@ let mockAnimes = [
             { id: 38000, title: "Kimetsu no Yaiba" }, // Demon Slayer
             { id: 31964, title: "Boku no Hero Academia" } // My Hero Academia
         ];
-
-
         const popularAnimesCarouselEl = document.getElementById('popularAnimesCarousel');
         const mostRecentAnimesCarouselEl = document.getElementById('mostRecentAnimesCarousel');
         const settingsModal = document.getElementById('settingsModal');
@@ -40,11 +40,7 @@ let mockAnimes = [
         const animeDetailsModalTitle = document.getElementById('animeDetailsModalTitle');
         const animeDetailsModalImage = document.getElementById('animeDetailsModalImage');
         const closeAnimeDetailsModalBtn = document.getElementById('closeAnimeDetailsModal');
-        const generateSynopsisBtn = document.getElementById('generateSynopsisBtn');
-        const generateSynopsisBtnText = document.getElementById('generateSynopsisBtnText');
-        const synopsisLoadingSpinner = document.getElementById('synopsisLoadingSpinner');
         const animeSynopsisArea = document.getElementById('animeSynopsisArea');
-        let currentAnimeTitleForSynopsis = "";
 
         function getThemeColor(variableName) {
             return getComputedStyle(document.documentElement).getPropertyValue(variableName).trim();
@@ -68,10 +64,7 @@ let mockAnimes = [
             animeDetailsModalImage.alt = `Imagem de ${anime.title}`;
             animeDetailsModalImage.onerror = getDefaultImageOnError; 
             currentAnimeTitleForSynopsis = anime.title;
-            animeSynopsisArea.innerHTML = anime.miniSynopsis || "Clique no botão \"Gerar Sinopse ✨\" para ver mais!"; 
-            generateSynopsisBtn.disabled = false;
-            generateSynopsisBtnText.textContent = "Gerar Sinopse ✨";
-            synopsisLoadingSpinner.classList.add('hidden');
+            animeSynopsisArea.innerHTML = anime.miniSynopsis
             animeDetailsModal.classList.remove('hidden');
         }
 
@@ -216,59 +209,6 @@ let mockAnimes = [
                 }
             });
         }
-
-
-        async function handleGenerateSynopsis() {
-            if (!currentAnimeTitleForSynopsis) return;
-
-            generateSynopsisBtn.disabled = true;
-            generateSynopsisBtnText.textContent = "Gerando...";
-            synopsisLoadingSpinner.classList.remove('hidden');
-            animeSynopsisArea.innerHTML = ""; 
-
-            const prompt = `Gere uma sinopse criativa e concisa para o anime: "${currentAnimeTitleForSynopsis}". A sinopse deve ser interessante, destacar os pontos principais da trama ou do universo do anime, e ter no máximo 3 parágrafos. Mantenha a sinopse em português do Brasil.`;
-            
-            let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
-            const payload = { contents: chatHistory };
-            const apiKey = ""; 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    console.error("Erro da API Gemini:", errorData);
-                    throw new Error(`Erro da API: ${errorData.error?.message || response.statusText}`);
-                }
-
-                const result = await response.json();
-
-                if (result.candidates && result.candidates.length > 0 &&
-                    result.candidates[0].content && result.candidates[0].content.parts &&
-                    result.candidates[0].content.parts.length > 0) {
-                    const text = result.candidates[0].content.parts[0].text;
-                    animeSynopsisArea.innerHTML = text.split('\n').map(p => `<p>${p}</p>`).join('');
-                } else {
-                    animeSynopsisArea.textContent = "Não foi possível gerar a sinopse ou a resposta da API está vazia.";
-                    console.warn("Resposta inesperada da API Gemini:", result);
-                }
-            } catch (error) {
-                console.error("Falha ao gerar sinopse:", error);
-                animeSynopsisArea.textContent = `Falha ao gerar sinopse: ${error.message}. Tente novamente.`;
-            } finally {
-                generateSynopsisBtn.disabled = false;
-                generateSynopsisBtnText.textContent = "Gerar Sinopse ✨";
-                synopsisLoadingSpinner.classList.add('hidden');
-            }
-        }
-
-        if (generateSynopsisBtn) generateSynopsisBtn.addEventListener('click', handleGenerateSynopsis);
-
         function applyThemeAndPopulate(theme) {
             document.body.className = theme + '-theme';
             localStorage.setItem('animeSiteTheme', theme);

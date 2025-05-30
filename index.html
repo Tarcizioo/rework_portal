@@ -112,17 +112,58 @@
             </div>
             <img id="animeDetailsModalImage" src="" alt="Imagem do Anime" class="anime-details-modal-image">
             <div class="modal-actions" style="justify-content: center; margin-bottom: 1rem;">
-                 <button id="generateSynopsisBtn" class="button button-accent">
-                    <span id="generateSynopsisBtnText">Gerar Sinopse ✨</span>
-                    <div id="synopsisLoadingSpinner" class="loading-spinner hidden"></div>
-                </button>
             </div>
             <div id="animeSynopsisArea" class="synopsis-area">
-                Clique no botão acima para gerar uma sinopse!
             </div>
         </div>
     </div>
+    <div id="authModal" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width: 28rem;"> <div class="modal-header">
+                <h3 id="authModalTitle" class="modal-title">Aceder à Conta</h3>
+                <button id="closeAuthModalBtn" class="modal-close-button">
+                    <i data-lucide="x" class="icon"></i>
+                </button>
+            </div>
+            <div class="auth-tabs">
+                <button id="loginTabButton" class="auth-tab-button active" data-form="loginForm">Login</button>
+                <button id="registerTabButton" class="auth-tab-button" data-form="registerForm">Registo</button>
+            </div>
 
+            <form id="loginForm" class="auth-form active">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Palavra-passe</label>
+                    <input type="password" id="loginPassword" class="form-input" required>
+                </div>
+                <p id="loginErrorMessage" class="auth-error-message hidden"></p>
+                <div class="modal-actions" style="justify-content: center;">
+                    <button type="submit" class="button button-accent">Entrar</button>
+                </div>
+            </form>
+
+            <form id="registerForm" class="auth-form">
+                 <div class="form-group">
+                    <label for="registerUsername">Nome de Utilizador (opcional)</label>
+                    <input type="text" id="registerUsername" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email</label>
+                    <input type="email" id="registerEmail" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Palavra-passe</label>
+                    <input type="password" id="registerPassword" class="form-input" required>
+                </div>
+                <p id="registerErrorMessage" class="auth-error-message hidden"></p>
+                <div class="modal-actions" style="justify-content: center;">
+                    <button type="submit" class="button button-accent">Registar</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay hidden">
         <aside id="mobileSidebar" class="mobile-sidebar">

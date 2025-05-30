@@ -68,7 +68,7 @@
             width: 16rem; /* w-64 */
             background-color: var(--bg-secondary);
             padding: 1.5rem; /* p-6 */
-            border-radius: 0.5rem; /* rounded-lg */
+            border-radius: 1rem; /* rounded-lg */
             display: flex;
             flex-direction: column;
             gap: 1.5rem; /* space-y-6 (aproximado com gap) */
@@ -121,7 +121,7 @@
             flex: 1;
             background-color: var(--bg-secondary);
             padding: 1.5rem;
-            border-radius: 0.5rem;
+            border-radius: 1rem;
             box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -2px var(--shadow-color);
             overflow-y: auto;
         }
@@ -464,25 +464,6 @@
         .button:disabled {
             opacity: 0.7;
             cursor: not-allowed;
-        }
-        .loading-spinner {
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: white; 
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 0.5rem; 
-        }
-        .dark-theme .loading-spinner {
-            border-top-color: var(--text-primary);
-        }
-        .light-theme .loading-spinner {
-             border-top-color: var(--text-primary);
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
         }
 
         .mobile-sidebar-overlay {
