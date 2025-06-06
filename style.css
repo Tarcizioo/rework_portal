@@ -17,7 +17,7 @@
             --bg-tertiary: #e5e7eb; /* Usado em elementos como inputs, selects */
             --text-primary: #111827;
             --text-secondary: #374151;
-            --text-accent: #ef4444;
+            --text-accent: #961EF2;
             --border-color: #d1d5db;
             --shadow-color: rgba(0, 0, 0, 0.1);
         }
@@ -28,7 +28,7 @@
             --bg-tertiary: #21262d;
             --text-primary: #c9d1d9;
             --text-secondary: #8b949e;
-            --text-accent: #f87171;
+            --text-accent: #961EF2;
             --border-color: #30363d;
             --shadow-color: rgba(0, 0, 0, 0.2);
         }
@@ -66,7 +66,7 @@
         /* Sidebar */
         .sidebar {
             width: 16rem; /* w-64 */
-            background-color: var(--bg-secondary);
+            background-color: var(--bg-primary);
             padding: 1.5rem; /* p-6 */
             border-radius: 1rem; /* rounded-lg */
             display: flex;
@@ -84,7 +84,8 @@
         .sidebar nav {
             display: flex;
             flex-direction: column;
-            gap: 0.5rem; /* space-y-2 (aproximado com gap) */
+            gap: 2.5rem; /* space-y-2 (aproximado com gap) */
+            font-size: large;
         }
 
         .nav-link {
@@ -95,12 +96,32 @@
             padding: 0.5rem; /* p-2 */
             border-radius: 0.5rem; /* rounded-lg */
             text-decoration: none;
-            transition: background-color 0.2s, color 0.2s;
+            transition: background-color 0.3s, color 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
         }
-        .nav-link:hover {
+        .nav-link:hover,
+        .nav-link:active {
             color: var(--text-accent);
-            background-color: var(--bg-tertiary);
+            background: linear-gradient(90deg, rgba(150,30,242,0.10) 0%, rgba(150,30,242,0.05) 100%);
+            box-shadow: 0 0 16px 0 rgba(150,30,242,0.25);
         }
+        .nav-link:hover::after,
+        .nav-link:active::after {
+            content: '';
+            position: absolute;
+            top: 10%;
+            height: 80%;
+            width: 6px;
+            border-radius: 6px;
+            background: linear-gradient(180deg, #ff5ecd 50%, #961EF2 50%);
+            box-shadow: 0 0 8px 2px #961EF280;
+        }
+        .nav-link::after {
+            content: "";
+            display: none
+        }
+
         .nav-link .icon { /* Classe para os ícones Lucide */
             width: 1.25rem; /* w-5 */
             height: 1.25rem; /* h-5 */
@@ -142,6 +163,7 @@
             position: relative;
             margin-top: 1rem;
             width: 100%;
+            z-index: auto; /* Garante que fique acima de outros elementos */
         }
         .search-input {
             width: 100%;
@@ -153,6 +175,8 @@
             border: 1px solid var(--border-color);
             outline: none;
             transition: box-shadow 0.2s, border-color 0.2s;
+            position: relative;
+            z-index: 20;
         }
         .search-input:focus {
             border-color: transparent;
@@ -166,13 +190,13 @@
             width: 1.25rem;
             height: 1.25rem;
             color: var(--text-secondary);
-            z-index: 1; /* Para garantir que o ícone fique sobre o input */
+            z-index: 25; /* Fica acima do input */
         }
 
         /* Estilos para a prévia da pesquisa */
         #searchResultsPreview {
             position: absolute;
-            top: 100%; /* Posiciona abaixo da barra de pesquisa */
+            top: calc(100% - 12px);
             left: 0;
             right: 0;
             background-color: var(--bg-primary);
@@ -180,7 +204,7 @@
             border-top: none; /* Remove a borda superior para conectar com a barra */
             border-radius: 0 0 0.5rem 0.5rem; /* Arredonda cantos inferiores */
             box-shadow: 0 4px 6px -1px var(--shadow-color);
-            z-index: 100; /* Garante que fique sobre outros elementos */
+            z-index: 15; /* Fica atrás da search bar, mas acima dos cards dos animes */
             max-height: 300px; /* Altura máxima antes de scrollar */
             overflow-y: auto;
         }
