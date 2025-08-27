@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfil</title>
+  <link rel="stylesheet" href="profile.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://unpkg.com/lucide@0.378.0/dist/umd/lucide.min.js" defer></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick.css"/>
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick-theme.css"/>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Lexend:wght@100..900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@0.378.0/dist/umd/lucide.min.js" defer></script>
+</head>
+<body class="dark-theme">
+
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-title">nome</div>
+        <button id="toggleSidebarBtn" class="toggle-sidebar-btn">
+            <i data-lucide="chevron-left" class="icon"></i>
+        </button>
+      </div>
+      <nav>
+        <a href="index.html" class="nav-link"><i data-lucide="home" class="icon"></i><span>Home</span></a>
+        <a href="#" class="nav-link"><i data-lucide="bar-chart-2" class="icon"></i><span>Populares</span></a>
+        <a href="#" class="nav-link"><i data-lucide="calendar-clock" class="icon"></i><span>Lançamentos</span></a>
+        <a href="#" id="settingsLink" class="nav-link"><i data-lucide="settings" class="icon"></i><span>Configurações</span></a>
+        <a href="profile.html" class="nav-link active"><i data-lucide="user" class="icon"></i><span>Perfil</span></a>
+      </nav>
+      <div class="sidebar-logout">
+        <a href="#" class="nav-link">
+          <i data-lucide="log-out" class="icon"></i>
+          <span>Logout</span>
+        </a>
+    </div>
+
+    </aside>
+<!-- Modal Editar Perfil -->
+<div id="editProfileModal" class="modal-overlay hidden">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title">Editar Perfil</h3>
+      <button id="closeEditProfileModal" class="modal-close-button">
+        <i data-lucide="x" class="icon"></i>
+      </button>
+    </div>
+    <div class="form-group">
+      <label for="profileNameInput">Nome de usuário</label>
+      <input type="text" id="profileNameInput" class="form-input" placeholder="Seu nome">
+    </div>
+    <div class="form-group">
+      <label for="profileAvatarInput">Foto de Perfil</label>
+      <input type="file" id="profileAvatarInput" class="form-input" accept="image/*">
+    </div>
+    <div class="form-group">
+      <label for="profileBannerInput">Banner</label>
+      <input type="file" id="profileBannerInput" class="form-input" accept="image/*">
+    </div>
+    <div class="modal-actions">
+      <button id="saveProfileBtn" class="button button-accent">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Favoritos -->
+<div id="favoritesModal" class="modal-overlay hidden">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title">Escolher Favoritos (máx. 3)</h3>
+      <button id="closeFavoritesModal" class="modal-close-button">
+        <i data-lucide="x" class="icon"></i>
+      </button>
+    </div>
+
+    <div class="search-container" style="margin-bottom: 1rem;">
+      <input type="search" id="favoritesSearchInput" placeholder="Buscar animes..." class="search-input">
+      <i data-lucide="search" class="icon"></i>
+      <div id="favoritesSearchResults" class="hidden"></div>
+    </div>
+
+    <div id="selectedFavorites" class="favorites-cards">
+      <!-- favoritos escolhidos aparecem aqui -->
+    </div>
+
+    <div class="modal-actions">
+      <button id="saveFavoritesBtn" class="button button-accent">Salvar</button>
+    </div>
+  </div>
+</div>
+
+    <!-- Main content -->
+    <main class="main-content">
+      <!-- Banner -->
+      <div class="profile-banner">
+        <img src="https://placehold.co/1200x200?text=Banner" alt="Banner do usuário" class="banner-image">
+        <div class="profile-details">
+          <img src="https://placehold.co/150x150?text=Avatar" alt="Avatar do usuário" class="profile-avatar">
+          <h2 id="profileUsername">Usuário</h2>
+          <p id="profileHours">120h assistidas</p>
+          <button id="editProfileBtn" class="button button-accent">Editar Perfil</button>
+        </div>
+      </div>
+      
+      <div id="settingsModal" class="modal-overlay hidden">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Configurações</h3>
+            <button id="closeSettingsModal" class="modal-close-button">
+                <i data-lucide="x" class="icon"></i>
+            </button>
+        </div>
+        <div class="form-group">
+            <label for="themeSwitcher">Mudar Tema:</label>
+            <select id="themeSwitcher" class="form-select">
+                <option value="dark">Escuro</option>
+                <option value="light">Claro</option>
+            </select>
+        </div>
+         <div class="modal-actions">
+            <button id="saveSettings" class="button button-accent">
+                Salvar
+            </button>
+        </div>
+    </div>
+  </div>
+
+      <!-- Favoritos -->
+      <section class="carousel-section">
+        <div class="carousel-section-header">
+          <h2 class="carousel-section-title">Animes Favoritos</h2>
+          <button id="chooseFavoritesBtn" class="button button-accent">Escolher Favoritos</button>
+        </div>
+        <div id="favoritesContainer" class="favorites-cards">
+          <!-- Cards de exemplo -->
+          <div class="anime-item-wrapper">
+            <img src="https://cdn.myanimelist.net/images/anime/13/17405.jpg" alt="Naruto" class="anime-image-display">
+            <h3 class="anime-title-display">Naruto</h3>
+          </div>
+          <div class="anime-item-wrapper">
+            <img src="https://cdn.myanimelist.net/images/anime/1208/94745.jpg" alt="One Piece" class="anime-image-display">
+            <h3 class="anime-title-display">One Piece</h3>
+          </div>
+          <div class="anime-item-wrapper">
+            <img src="https://cdn.myanimelist.net/images/anime/3/40451.jpg" alt="Bleach" class="anime-image-display">
+            <h3 class="anime-title-display">Bleach</h3>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="profile.js" defer></script>
+    
+</body>
+</html>

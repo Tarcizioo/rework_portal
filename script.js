@@ -1,4 +1,4 @@
-    const heroCarouselEl = document.getElementById('heroCarousel');
+        const heroCarouselEl = document.getElementById('heroCarousel');
         const popularAnimesCarouselEl = document.getElementById('popularAnimesCarousel');
         const mostRecentAnimesCarouselEl = document.getElementById('mostRecentAnimesCarousel');
         const settingsModal = document.getElementById('settingsModal');
@@ -18,7 +18,7 @@
         const animeDetailsModalImage = document.getElementById('animeDetailsModalImage');
         const closeAnimeDetailsModalBtn = document.getElementById('closeAnimeDetailsModal');
         const animeSynopsisArea = document.getElementById('animeSynopsisArea');
-
+        
         // --- Funções Utilitárias ---
         function getThemeColor(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
         function getDefaultImageOnError(e) { e.target.src = `https://placehold.co/180x270/${getThemeColor('--bg-tertiary').substring(1)}/${getThemeColor('--text-secondary').substring(1)}?text=Erro`; }
@@ -179,7 +179,6 @@
                 } else { searchResultsPreview.innerHTML = `<p style="padding: 0.75rem; text-align: center;">Nenhum resultado.</p>`; }
             } catch (error) { console.error("Erro na busca:", error); searchResultsPreview.innerHTML = `<p style="padding: 0.75rem; text-align: center;">Erro ao buscar.</p>`; }
         };
-        
         // --- Inicialização e Event Listeners ---
         document.addEventListener('DOMContentLoaded', () => {
             if (typeof lucide !== 'undefined') lucide.createIcons();
@@ -223,3 +222,10 @@
                 if(settingsModal) settingsModal.classList.add('hidden');
             });
         });
+        const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.getElementById('toggleSidebarBtn');
+            if(toggleBtn) {
+                toggleBtn.addEventListener('click', () => {
+                    sidebar.classList.toggle('collapsed');
+                });
+            }
