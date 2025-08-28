@@ -27,12 +27,19 @@
         
         // --- Lógica de Modais ---
         function openAnimeDetailsModal(anime) {
-            if (!animeDetailsModal) return;
-            animeDetailsModalTitle.textContent = anime.title;
-            animeDetailsModalImage.src = anime.imageUrl;
-            animeSynopsisArea.innerHTML = `<p>${anime.fullSynopsis || anime.miniSynopsis}</p>`;
-            animeDetailsModal.classList.remove('hidden');
-        }
+    if (!animeDetailsModal) return;
+    animeDetailsModalTitle.textContent = anime.title;
+    animeDetailsModalImage.src = anime.imageUrl;
+    animeSynopsisArea.innerHTML = `<p>${anime.fullSynopsis || anime.miniSynopsis}</p>`;
+
+    document.getElementById('animeDetailsModalScore').textContent = anime.score;
+    document.getElementById('animeDetailsModalRank').textContent = anime.rank;
+    document.getElementById('animeDetailsModalSeason').textContent = anime.season;
+    
+
+    animeDetailsModal.classList.remove('hidden');
+}
+
         if (closeAnimeDetailsModalBtn) closeAnimeDetailsModalBtn.addEventListener('click', () => animeDetailsModal.classList.add('hidden'));
         if (closeSettingsModalBtn) closeSettingsModalBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
 
@@ -98,14 +105,18 @@
         }
 
         // --- Lógica de API e Dados ---
-        const transformApiData = (apiAnime) => ({
-            id: apiAnime.mal_id,
-            title: apiAnime.title_english || apiAnime.title,
-            imageUrl: apiAnime.images?.jpg?.large_image_url || apiAnime.images?.jpg?.image_url,
-            genres: (apiAnime.genres || []).map(g => g.name).join(', '),
-            miniSynopsis: (apiAnime.synopsis || "Sinopse não disponível.").substring(0, 250) + '...',
-            fullSynopsis: apiAnime.synopsis || "Sinopse não disponível."
-        });
+    const transformApiData = (apiAnime) => ({
+    id: apiAnime.mal_id,
+    title: apiAnime.title_english || apiAnime.title,
+    imageUrl: apiAnime.images?.jpg?.large_image_url || apiAnime.images?.jpg?.image_url,
+    genres: (apiAnime.genres || []).map(g => g.name).join(', '),
+    miniSynopsis: (apiAnime.synopsis || "Sinopse não disponível.").substring(0, 250) + '...',
+    fullSynopsis: apiAnime.synopsis || "Sinopse não disponível.",
+    score: apiAnime.score || "N/A",
+    rank: apiAnime.rank || "N/A",
+    season: apiAnime.season ? `${apiAnime.season.charAt(0).toUpperCase() + apiAnime.season.slice(1)} ${apiAnime.year}` : "Desconhecido"
+});
+
 
         async function fetchAndDisplayData() {
             showLoadingState(true);

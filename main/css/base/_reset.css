@@ -1,0 +1,19 @@
+/* Estilos globais para o container principal da aplicação */
+.app-container {
+    display: flex;
+    height: 100vh; /* Ocupa a altura total da tela */
+    padding: 1rem;
+    gap: 1rem;
+}
+/* Media query para o app-container no mobile */
+@media (max-width: 768px) {
+    .app-container {
+        flex-direction: column;
+        padding: 0;
+        height: auto; /* Ajuste para mobile */
+        overflow: auto; /* Permite rolagem no mobile */
+    }
+    body {
+        overflow: auto; /* Permite rolagem no mobile */
+    }
+}

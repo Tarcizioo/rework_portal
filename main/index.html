@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>main</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://unpkg.com/lucide@0.378.0/dist/umd/lucide.min.js" defer></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick.css"/>
@@ -107,20 +107,29 @@
     </div>
 
     <div id="animeDetailsModal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="animeDetailsModalTitle" class="modal-title">Detalhes do Anime</h3>
-                <button id="closeAnimeDetailsModal" class="modal-close-button">
-                    <i data-lucide="x" class="icon"></i>
-                </button>
-            </div>
-            <img id="animeDetailsModalImage" src="" alt="Imagem do Anime" class="anime-details-modal-image">
-            <div class="modal-actions" style="justify-content: center; margin-bottom: 1rem;">
-            </div>
-            <div id="animeSynopsisArea" class="synopsis-area">
-            </div>
-        </div>
+     <div class="modal-content anime-details-modal">
+      <div class="modal-header">
+       <h2 id="animeDetailsModalTitle" class="modal-title"></h2>
+      <button id="closeAnimeDetailsModal" class="modal-close-button">&times;</button>
     </div>
+
+    <div class="anime-details-body">
+      <img id="animeDetailsModalImage" class="anime-details-modal-image" alt="Poster do anime">
+      
+      <div class="anime-details-info">
+        <div class="anime-meta">
+          <p><strong>Nota:</strong> <span id="animeDetailsModalScore">-</span></p>
+          <p><strong>Ranking:</strong> <span id="animeDetailsModalRank">-</span></p>
+          <p><strong>Temporada:</strong> <span id="animeDetailsModalSeason">-</span></p>
+        </div>
+
+        <div id="animeSynopsisArea" class="synopsis-area"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
     <div id="authModal" class="modal-overlay hidden">
         <div class="modal-content" style="max-width: 28rem;"> <div class="modal-header">
                 <h3 id="authModalTitle" class="modal-title">Aceder à Conta</h3>
