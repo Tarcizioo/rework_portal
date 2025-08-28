@@ -1,0 +1,21 @@
+.light-theme {
+            --bg-primary: #f3f4f6;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #374151;
+            --text-accent: #961EF2;
+            --border-color: #d1d5db;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .dark-theme {
+            --bg-primary: #121214;
+            --bg-secondary: #1A1A1E;
+            --bg-tertiary: #21262d;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --text-accent: #961EF2;
+            --border-color: #30363d;
+            --shadow-color: rgba(0, 0, 0, 0.2);
+        }

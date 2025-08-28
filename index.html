@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>main</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://unpkg.com/lucide@0.378.0/dist/umd/lucide.min.js" defer></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick-theme.css"/>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Lexend:wght@100..900&display=swap" rel="stylesheet">
+</head>
+<body class="dark-theme">
+
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">nome</div>
+                <button id="toggleSidebarBtn" class="toggle-sidebar-btn">
+                    <i data-lucide="chevron-left" class="icon"></i>
+                </button>
+            </div>
+            <nav>
+                <a href="index.html" class="nav-link active"><i data-lucide="home" class="icon"></i><span>Home</span></a>
+                <a href="#" class="nav-link"><i data-lucide="bar-chart-2" class="icon"></i><span>Populares</span></a>
+                <a href="#" class="nav-link"><i data-lucide="calendar-clock" class="icon"></i><span>Lançamentos</span></a>
+                <a href="#" id="settingsLink" class="nav-link"><i data-lucide="settings" class="icon"></i><span>Configurações</span></a>
+                <a href="profile.html" class="nav-link"><i data-lucide="user" class="icon"></i><span>Perfil</span></a>
+            </nav>
+            <div class="sidebar-logout">
+                <a href="#" class="nav-link">
+                    <i data-lucide="log-out" class="icon"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="main-header">
+                <h1 class="user-greeting" id="userGreeting">Olá, <user>!!</h1>
+                <div class="search-container">
+                    <input type="search" id="searchInput" placeholder="Pesquisar animes..." class="search-input">
+                    <i data-lucide="search" class="icon"></i>
+                    <div id="searchResultsPreview" class="hidden">
+                    </div>
+                </div>
+            </header>
+
+            <section class="hero-section">
+                <div id="heroCarousel">
+                    <!-- ta no js -->
+                </div>
+            </section>
+
+            <section class="carousel-section">
+                <div class="carousel-section-header">
+                    <h2 class="carousel-section-title">Animes Populares</h2>
+                    <a href="#" class="see-more-link">ver mais ></a>
+                </div>
+                <div id="popularAnimesCarousel">
+                    <p class="carousel-loading-message">A carregar animes...</p>
+                </div>
+            </section>
+
+            <section class="carousel-section">
+                <div class="carousel-section-header">
+                    <h2 class="carousel-section-title">Lançamentos da Temporada</h2>
+                    <a href="#" class="see-more-link">ver mais ></a>
+                </div>
+                <div id="mostRecentAnimesCarousel">
+                    <p class="carousel-loading-message">A carregar animes...</p>
+                </div>
+            </section>
+            
+            <button id="mobileMenuButton" class="mobile-menu-button">
+                <i data-lucide="menu" class="icon"></i>
+            </button>
+        </main>
+    </div>
+
+    <div id="settingsModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Configurações</h3>
+                <button id="closeSettingsModal" class="modal-close-button">
+                    <i data-lucide="x" class="icon"></i>
+                </button>
+            </div>
+            <div class="form-group">
+                <label for="themeSwitcher">Mudar Tema:</label>
+                <select id="themeSwitcher" class="form-select">
+                    <option value="dark">Escuro</option>
+                    <option value="light">Claro</option>
+                </select>
+            </div>
+             <div class="modal-actions">
+                <button id="saveSettings" class="button button-accent">
+                    Salvar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="animeDetailsModal" class="modal-overlay hidden">
+     <div class="modal-content anime-details-modal">
+      <div class="modal-header">
+       <h2 id="animeDetailsModalTitle" class="modal-title"></h2>
+      <button id="closeAnimeDetailsModal" class="modal-close-button">&times;</button>
+    </div>
+
+    <div class="anime-details-body">
+      <img id="animeDetailsModalImage" class="anime-details-modal-image" alt="Poster do anime">
+      
+      <div class="anime-details-info">
+        <div class="anime-meta">
+          <p><strong>Nota:</strong> <span id="animeDetailsModalScore">-</span></p>
+          <p><strong>Ranking:</strong> <span id="animeDetailsModalRank">-</span></p>
+          <p><strong>Temporada:</strong> <span id="animeDetailsModalSeason">-</span></p>
+        </div>
+
+        <div id="animeSynopsisArea" class="synopsis-area"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+    <div id="authModal" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width: 28rem;"> <div class="modal-header">
+                <h3 id="authModalTitle" class="modal-title">Aceder à Conta</h3>
+                <button id="closeAuthModalBtn" class="modal-close-button">
+                    <i data-lucide="x" class="icon"></i>
+                </button>
+            </div>
+            <div class="auth-tabs">
+                <button id="loginTabButton" class="auth-tab-button active" data-form="loginForm">Login</button>
+                <button id="registerTabButton" class="auth-tab-button" data-form="registerForm">Registo</button>
+            </div>
+
+            <form id="loginForm" class="auth-form active">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Palavra-passe</label>
+                    <input type="password" id="loginPassword" class="form-input" required>
+                </div>
+                <p id="loginErrorMessage" class="auth-error-message hidden"></p>
+                <div class="modal-actions" style="justify-content: center;">
+                    <button type="submit" class="button button-accent">Entrar</button>
+                </div>
+            </form>
+
+            <form id="registerForm" class="auth-form">
+                 <div class="form-group">
+                    <label for="registerUsername">Nome de Utilizador (opcional)</label>
+                    <input type="text" id="registerUsername" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email</label>
+                    <input type="email" id="registerEmail" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Palavra-passe</label>
+                    <input type="password" id="registerPassword" class="form-input" required>
+                </div>
+                <p id="registerErrorMessage" class="auth-error-message hidden"></p>
+                <div class="modal-actions" style="justify-content: center;">
+                    <button type="submit" class="button button-accent">Registar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay hidden">
+        <aside id="mobileSidebar" class="mobile-sidebar">
+             <div class="mobile-sidebar-header">
+                <div class="sidebar-title">nome</div>
+                <button id="closeMobileSidebar" class="mobile-sidebar-close-button">
+                    <i data-lucide="x" class="icon"></i>
+                </button>
+            </div>
+            <nav>
+                 <a href="#" class="nav-link">
+                    <i data-lucide="home" class="icon"></i>
+                    <span>Home</span>
+                </a>
+                <a href="#" class="nav-link">
+                    <i data-lucide="bar-chart-2" class="icon"></i>
+                    <span>Mais Populares</span>
+                </a>
+                <a href="#" class="nav-link">
+                    <i data-lucide="calendar-clock" class="icon"></i>
+                    <span>Lançamentos</span>
+                </a>
+                <a href="#" id="settingsLinkMobile" class="nav-link">
+                    <i data-lucide="settings" class="icon"></i>
+                    <span>Configurações</span>
+                </a>
+                 <a href="#" class="nav-link">
+                    <i data-lucide="user" class="icon"></i>
+                    <span>Usuário</span>
+                </a>
+            </nav>
+            <div class="sidebar-logout" style="position: relative; bottom: auto; left: auto; margin-top: auto;"> <a href="#" class="nav-link">
+                    <i data-lucide="log-out" class="icon"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+    </div>
+    <script src="js/script.js"></script>
+
+</body>
+</html>

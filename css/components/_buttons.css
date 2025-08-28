@@ -1,0 +1,39 @@
+.button {
+    font-weight: 600;
+    padding: 0.6rem 1.2rem;
+    border-radius: 0.5rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.button-accent {
+    background-color: var(--text-accent);
+    color: white;
+}
+.button-accent:hover {
+    opacity: 0.9;
+}
+
+/* Botão de menu mobile */
+.mobile-menu-button {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    background-color: var(--text-accent);
+    color: white;
+    padding: 0.75rem;
+    border-radius: 50%;
+    box-shadow: 0 4px 6px var(--shadow-color);
+    z-index: 50;
+    border: none;
+    cursor: pointer;
+    display: none; /* Escondido por padrão no desktop */
+    align-items: center;
+    justify-content: center;
+}
+
+@media (max-width: 767px) {
+    .mobile-menu-button {
+        display: flex; /* Mostra no mobile */
+    }
+}
