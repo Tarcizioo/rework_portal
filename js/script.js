@@ -27,7 +27,8 @@
         
         // --- Lógica de Modais ---
         function openAnimeDetailsModal(anime) {
-    if (!animeDetailsModal) return;
+            if (!animeDetailsModal) return;
+
     animeDetailsModalTitle.textContent = anime.title;
     animeDetailsModalImage.src = anime.imageUrl;
     animeSynopsisArea.innerHTML = `<p>${anime.fullSynopsis || anime.miniSynopsis}</p>`;
@@ -35,7 +36,8 @@
     document.getElementById('animeDetailsModalScore').textContent = anime.score;
     document.getElementById('animeDetailsModalRank').textContent = anime.rank;
     document.getElementById('animeDetailsModalSeason').textContent = anime.season;
-    
+    document.getElementById('animeDetailsModalGenres').textContent = anime.genres;
+    document.getElementById('animeDetailsModalUsers').textContent = anime.users || 'N/A';
 
     animeDetailsModal.classList.remove('hidden');
 }

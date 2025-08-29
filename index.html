@@ -106,21 +106,27 @@
         </div>
     </div>
 
-    <div id="animeDetailsModal" class="modal-overlay hidden">
-     <div class="modal-content anime-details-modal">
-      <div class="modal-header">
-       <h2 id="animeDetailsModalTitle" class="modal-title"></h2>
+<div id="animeDetailsModal" class="modal-overlay hidden">
+  <div class="modal-content anime-details-modal">
+    <div class="modal-header">
+      <h2 id="animeDetailsModalTitle" class="modal-title"></h2>
       <button id="closeAnimeDetailsModal" class="modal-close-button">&times;</button>
     </div>
 
     <div class="anime-details-body">
+      <!-- Poster -->
       <img id="animeDetailsModalImage" class="anime-details-modal-image" alt="Poster do anime">
-      
-      <div class="anime-details-info">
+      <!-- Informações -->
+        <div class="anime-details-info">
         <div class="anime-meta">
-          <p><strong>Nota:</strong> <span id="animeDetailsModalScore">-</span></p>
-          <p><strong>Ranking:</strong> <span id="animeDetailsModalRank">-</span></p>
+            <div class="status">
+          <div><strong>⭐</strong> <span id="animeDetailsModalScore">-</span></div>
+          <div><strong>Ranking: #</strong> <span id="animeDetailsModalRank">-</span></div>
+          <div><strong>👥 Usuários:</strong> <span id="animeDetailsModalUsers">-</span></div>
           <p><strong>Temporada:</strong> <span id="animeDetailsModalSeason">-</span></p>
+            </div>
+          
+          <div id="animeDetailsModalGenres" class="tags"></div>
         </div>
 
         <div id="animeSynopsisArea" class="synopsis-area"></div>
@@ -128,6 +134,7 @@
     </div>
   </div>
 </div>
+
 
 
     <div id="authModal" class="modal-overlay hidden">
