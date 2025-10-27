@@ -31,11 +31,12 @@
     animeDetailsModalTitle.textContent = anime.title;
     animeDetailsModalImage.src = anime.imageUrl;
     animeSynopsisArea.innerHTML = `<p>${anime.fullSynopsis || anime.miniSynopsis}</p>`;
-
     document.getElementById('animeDetailsModalScore').textContent = anime.score;
     document.getElementById('animeDetailsModalRank').textContent = anime.rank;
     document.getElementById('animeDetailsModalSeason').textContent = anime.season;
     
+    renderRatingInModal(anime.id); // Mostra as estrelas/notas do usuário
+    renderListsInModal(anime.id);  // Mostra os botões de lista do usuário
 
     animeDetailsModal.classList.remove('hidden');
 }
@@ -240,3 +241,35 @@
                     sidebar.classList.toggle('collapsed');
                 });
             }
+            function renderRatingInModal(animeId) {
+    const container = document.getElementById("animeDetailsModalScore");
+    container.innerHTML = "";
+    const currentRating = getAnimeRating(animeId) || 0;
+    for (let i = 1; i <= 5; i++) {
+        const star = document.createElement("span");
+        star.textContent = "★";
+        star.style.cursor = "pointer";
+        star.style.color = i <= currentRating ? "#FFC700" : "#696969";
+        star.onclick = function() {
+            rateAnime(animeId, i);
+            renderRatingInModal(animeId);
+        };
+        container.appendChild(star);
+    }
+}
+
+function renderListsInModal(animeId) {
+    const container = document.getElementById("animeDetailsModalUserListsArea"); // Exemplo de uso, crie um div próprio se quiser
+    container.innerHTML = "";
+    const lists = Object.keys(getUserData().lists);
+    lists.forEach(list => {
+        const button = document.createElement("button");
+        button.textContent = list;
+        button.className = "list-btn";
+        button.onclick = function () {
+            addToList(animeId, list);
+            // Opcional: mostre confirmação ou refresque o visual
+        };
+        container.appendChild(button);
+    });
+}
