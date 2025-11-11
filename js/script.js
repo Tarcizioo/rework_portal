@@ -242,3 +242,36 @@
                     sidebar.classList.toggle('collapsed');
                 });
             }
+const auth = document.getElementById('auth');
+const toSignUp = document.getElementById('goSignUp');
+const toLogin  = document.getElementById('goLogin');
+
+if (toSignUp) {
+  toSignUp.addEventListener('click', (e) => {
+    e.preventDefault();
+    auth.classList.add('is-signup');
+  });
+}
+if (toLogin) {
+  toLogin.addEventListener('click', (e) => {
+    e.preventDefault();
+    auth.classList.remove('is-signup');
+  });
+}
+
+/* Opcional: ativar pelo hash (auth.html#signup) */
+if (location.hash === '#signup') {
+  auth.classList.add('is-signup');
+}
+window.addEventListener('hashchange', () => {
+  if (location.hash === '#signup') auth.classList.add('is-signup');
+  else auth.classList.remove('is-signup');
+});
+
+/* Opcional: toggle de senha (demo) */
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.pw-toggle');
+  if (!btn) return;
+  const input = btn.parentElement.querySelector('input');
+  input.type = input.type === 'password' ? 'text' : 'password';
+});
