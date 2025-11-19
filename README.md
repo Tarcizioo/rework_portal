@@ -1,44 +1,58 @@
-## Descrição
-Este é um projeto pessoal de estudo e desenvolvimento de uma plataforma web interativa para entusiastas de anime. O objetivo é criar um espaço para descobrir, acompanhar e, futuramente, avaliar animes, servindo como um exercício prático de tecnologias frontend e integração com APIs.
+# Portal de Animes (Rework)
 
-## Demonstração Visual (Screenshots)
-![494834381_9399080730191841_7437695162728273977_n](https://github.com/user-attachments/assets/227d9c33-f5db-4c3c-97d4-0c9cfce6f8ff)
+[![Deploy](https://img.shields.io/badge/Ver%20Deploy-GH%20Pages-brightgreen)](https://tarcizioo.github.io/rework_portal/index.html)
 
-## Funcionalidades Implementadas
-* **Navegação por Carrosséis:** Visualização de animes nas categorias "Animes Populares" e "Mais Recentes" através de carrosséis interativos (utilizando Slick Carousel).
-* **Busca de Animes:** Barra de pesquisa funcional que exibe uma pré-visualização dos resultados correspondentes em tempo real.
-* **Detalhes do Anime:** Ao clicar num anime (nos carrosséis ou na prévia da busca), um modal exibe a imagem e uma mini-sinopse do anime (dados obtidos via API Jikan).
-* **Temas:** Opção de alternar entre tema claro (light mode) e escuro (dark mode), com a preferência guardada no `localStorage`.
-* **Layout Responsivo:** Interface adaptada para visualização em diferentes tamanhos de ecrã (desktop, tablet, mobile).
-* **Base para Autenticação:** Estrutura inicial para registo e login de utilizadores com Firebase Authentication (funcionalidade de perfil completo e persistência de dados adiada).
+## 📖 Descrição
+Este é um projeto pessoal de estudo e desenvolvimento de uma plataforma web interativa e responsiva para entusiastas de anime. O objetivo é criar um espaço para descobrir, acompanhar e (futuramente) avaliar animes, servindo como um exercício prático de tecnologias frontend, consumo de APIs e autenticação de usuários.
+
+## 📸 Demonstração Visual (Screenshots)
+
+### Desktop
+| Página Inicial (Light) | Modal de Detalhes (Dark) | Página de Perfil |
+| :---: | :---: | :---: |
+| ![Demonstração da página inicial no modo claro, com busca de "abba" ativa](<img width="1865" height="879" alt="main screen" src="https://github.com/user-attachments/assets/7271bbfa-dd08-4c5b-a0a4-d73436967d72" />) | ![Demonstração do modal de detalhes do anime Frieren no modo escuro]([COLE A URL DA IMAGEM 'image_8e3e48.jpg' AQUI]) | ![Demonstração da página de perfil do usuário, com banner, avatar e seção de favoritos]([COLE A URL DA IMAGEM 'image_8e3e82.png' AQUI]) |
+
+### Mobile
+A interface é totalmente responsiva, com uma barra de navegação dedicada para dispositivos móveis, garantindo uma experiência de usuário fluida em qualquer tamanho de tela.
+
+![DemonstraGas_de_design_responsivo_mobile]([COLE A URL DA IMAGEM 'image_8e45e2.jpg' AQUI])
+
+## ✨ Funcionalidades Implementadas
+* **Navegação por Carrosséis:** Visualização de animes em "Animes Populares" e "Lançamentos" através de carrosséis interativos (Slick Carousel).
+* **Busca em Tempo Real:** Barra de pesquisa funcional que consome a API e exibe uma pré-visualização dos resultados em tempo real.
+* **Modal de Detalhes:** Ao clicar em um anime, um modal exibe detalhes ricos como ranking, temporada, gêneros e sinopse (dados da API Jikan).
+* **Temas Light & Dark:** Opção de alternar entre tema claro (light) e escuro (dark), com a preferência salva no `localStorage`.
+* **Design Responsivo:** Interface totalmente adaptada para desktop e mobile, incluindo uma barra de navegação inferior (`Bottom Nav`) para dispositivos móveis.
+* **Página de Perfil de Usuário:** Estrutura de perfil implementada (via Firebase) com:
+    * Banner e Avatar personalizáveis.
+    * Estatísticas (ex: "120h assistidas").
+    * Seção para "Animes Favoritos".
 * **Ícones Modernos:** Utilização da biblioteca Lucide Icons para uma interface limpa.
 
-## Tecnologias Utilizadas
+## 🛠️ Tecnologias Utilizadas
 * **Frontend:**
     * HTML5
-    * CSS3 (Puro, com variáveis CSS para temas)
+    * CSS3 (Puro, com Variáveis CSS para temas)
     * JavaScript (Puro, ES Modules)
 * **Bibliotecas JavaScript:**
     * [jQuery](https://jquery.com/) (Requisito para o Slick Carousel)
     * [Slick Carousel](https://kenwheeler.github.io/slick/) - Para os carrosséis de animes.
     * [Lucide Icons](https://lucide.dev/) - Biblioteca de ícones SVG.
-* **APIs Externas:**
+* **APIs & Backend:**
     * [Jikan API (v4)](https://jikan.moe/) - Para buscar informações e imagens de animes (baseada no MyAnimeList).
+    * [Firebase](https://firebase.google.com/) - Para autenticação e armazenamento de dados do usuário (perfil, favoritos).
 
-## Como Usar
-* Navegue pelos carrosséis "Animes Populares" e "Mais Recentes".
-* Utilize a barra de pesquisa no topo para encontrar animes específicos; uma pré-visualização dos resultados será exibida.
-* Clique num anime (nos carrosséis ou na prévia) para abrir um modal com sua imagem e uma breve sinopse.
-* Clique no ícone de configurações na barra lateral para mudar o tema do site (claro/escuro).
-* (Quando a funcionalidade de perfis estiver completa) Clique em "Usuário" para aceder ao modal de login/registo. Após o login, este link levará ao seu perfil e um botão de "Logout" aparecerá.
+## 🚀 Como Usar
+1.  Navegue pelos carrosséis "Animes Populares" e "Lançamentos".
+2.  Utilize a barra de pesquisa no topo para encontrar animes específicos.
+3.  Clique em um anime (nos carrosséis ou na prévia) para abrir o modal com detalhes.
+4.  Clique no ícone de **Configurações** na barra lateral (desktop) ou inferior (mobile) para mudar o tema.
+5.  Acesse a página de **Perfil** para visualizar suas estatísticas e animes favoritos.
 
-## Próximos Passos / Funcionalidades Futuras (Sugestões)
-* Implementação completa da página de perfil do utilizador.
-* Sistema de notas (0-10 ou estrelas) para obras e episódios, salvos por utilizador.
-* Listas personalizadas de utilizador: "A Assistir", "Assistidos", "Favoritos", "Desistiu", etc.
-* Página de detalhes completa para cada anime, com mais informações (géneros, estúdio, data de lançamento, lista de episódios, trailers).
-* Integração de trailers do YouTube.
-* Filtros avançados por género, ano, etc.
-* Secção de "Próximos Lançamentos" mais detalhada.
-
----
+## 🎯 Próximos Passos / Funcionalidades Futuras
+* Finalizar a implementação completa da página de perfil, permitindo que o usuário edite o perfil e adicione/remova "Animes Favoritos".
+* Implementar o cálculo real de "horas assistidas" com base nos animes marcados como "Assistidos".
+* Sistema de notas (0-10 ou estrelas) para obras e episódios.
+* Criação de listas personalizadas do usuário: "A Assistir", "Assistidos", "Desistiu", etc.
+* Página de detalhes completa para cada anime (substituindo o modal), com lista de episódios, trailers e resenhas.
+* Filtros avançados por gênero, ano e estúdio na página "Populares".
