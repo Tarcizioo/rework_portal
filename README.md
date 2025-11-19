@@ -10,7 +10,7 @@ Este é um projeto pessoal de estudo e desenvolvimento de uma plataforma web int
 ### Desktop
 | Página Inicial (Light) | Modal de Detalhes (Dark) | Página de Perfil |
 | :---: | :---: | :---: |
-| ![Demonstração da página inicial no modo claro, com busca de "abba" ativa](<img width="1865" height="879" alt="main screen" src="https://github.com/user-attachments/assets/7271bbfa-dd08-4c5b-a0a4-d73436967d72" />) | ![Demonstração do modal de detalhes do anime Frieren no modo escuro]([COLE A URL DA IMAGEM 'image_8e3e48.jpg' AQUI]) | ![Demonstração da página de perfil do usuário, com banner, avatar e seção de favoritos]([COLE A URL DA IMAGEM 'image_8e3e82.png' AQUI]) |
+| ![Demonstração da página inicial no modo claro, com busca de "abba" ativa]("https://github.com/user-attachments/assets/7271bbfa-dd08-4c5b-a0a4-d73436967d72") | ![Demonstração do modal de detalhes do anime Frieren no modo escuro]([COLE A URL DA IMAGEM 'image_8e3e48.jpg' AQUI]) | ![Demonstração da página de perfil do usuário, com banner, avatar e seção de favoritos]([COLE A URL DA IMAGEM 'image_8e3e82.png' AQUI]) |
 
 ### Mobile
 A interface é totalmente responsiva, com uma barra de navegação dedicada para dispositivos móveis, garantindo uma experiência de usuário fluida em qualquer tamanho de tela.
