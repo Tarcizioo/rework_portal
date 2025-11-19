@@ -17,8 +17,6 @@ A interface é totalmente responsiva, com uma barra de navegação dedicada para
 
 ![Mobile View](main%20screen%20mobile.png)
 
-![DemonstraGas_de_design_responsivo_mobile]([COLE A URL DA IMAGEM 'image_8e45e2.jpg' AQUI])
-
 ## ✨ Funcionalidades Implementadas
 * **Navegação por Carrosséis:** Visualização de animes em "Animes Populares" e "Lançamentos" através de carrosséis interativos (Slick Carousel).
 * **Busca em Tempo Real:** Barra de pesquisa funcional que consome a API e exibe uma pré-visualização dos resultados em tempo real.
@@ -49,12 +47,12 @@ A interface é totalmente responsiva, com uma barra de navegação dedicada para
 2.  Utilize a barra de pesquisa no topo para encontrar animes específicos.
 3.  Clique em um anime (nos carrosséis ou na prévia) para abrir o modal com detalhes.
 4.  Clique no ícone de **Configurações** na barra lateral (desktop) ou inferior (mobile) para mudar o tema.
-5.  Acesse a página de **Perfil** para visualizar suas estatísticas e animes favoritos.
-
+5.  Acesse a página de **Perfil** para editar do jeito que quiser e adicionar seus animes favoritos.
+   
 ## 🎯 Próximos Passos / Funcionalidades Futuras
-* Finalizar a implementação completa da página de perfil, permitindo que o usuário edite o perfil e adicione/remova "Animes Favoritos".
 * Implementar o cálculo real de "horas assistidas" com base nos animes marcados como "Assistidos".
 * Sistema de notas (0-10 ou estrelas) para obras e episódios.
 * Criação de listas personalizadas do usuário: "A Assistir", "Assistidos", "Desistiu", etc.
 * Página de detalhes completa para cada anime (substituindo o modal), com lista de episódios, trailers e resenhas.
 * Filtros avançados por gênero, ano e estúdio na página "Populares".
+* Finalizar a implementação do Firebase.
