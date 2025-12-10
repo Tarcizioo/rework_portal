@@ -4,7 +4,9 @@ import {
     signInWithEmailAndPassword, 
     onAuthStateChanged, 
     signOut, 
-    updateProfile 
+    updateProfile,
+    sendPasswordResetEmail,
+    sendEmailVerification
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 // IMPORTAÇÃO DO NOVO MÓDULO DE MODAL
@@ -235,16 +237,38 @@ document.addEventListener('DOMContentLoaded', () => {
     if (mobileSidebarOverlay) mobileSidebarOverlay.addEventListener('click', (e) => { if (e.target === mobileSidebarOverlay) closeMobileNav(); });
 
     // Settings
-    if (settingsLink) settingsLink.addEventListener('click', (e) => { e.preventDefault(); if(settingsModal) settingsModal.classList.remove('hidden'); });
-    if (settingsLinkMobile) settingsLinkMobile.addEventListener('click', (e) => { e.preventDefault(); closeMobileNav(); if(settingsModal) settingsModal.classList.remove('hidden'); });
-    if (saveSettingsBtn) saveSettingsBtn.addEventListener('click', () => {
-        if(themeSwitcher) {
-            const newTheme = themeSwitcher.value;
-            document.body.className = `${newTheme}-theme`;
-            localStorage.setItem('animeSiteTheme', newTheme);
-        }
-        if(settingsModal) settingsModal.classList.add('hidden');
-    });
+    if (settingsLink) {
+        settingsLink.addEventListener('click', (e) => { 
+            e.preventDefault(); 
+            if(settingsModal) settingsModal.classList.remove('hidden'); 
+        });
+    }
+
+    if (settingsLinkMobile) {
+        settingsLinkMobile.addEventListener('click', (e) => { 
+            e.preventDefault(); 
+            closeMobileNav(); // Fecha o menu mobile antes de abrir o modal
+            if(settingsModal) settingsModal.classList.remove('hidden'); 
+        });
+    }
+
+    if (closeSettingsModalBtn) {
+        closeSettingsModalBtn.addEventListener('click', () => {
+            if(settingsModal) settingsModal.classList.add('hidden');
+        });
+    }
+
+    if (saveSettingsBtn) {
+        saveSettingsBtn.addEventListener('click', () => {
+            if(themeSwitcher) {
+                const newTheme = themeSwitcher.value;
+                document.body.className = `${newTheme}-theme`;
+                localStorage.setItem('animeSiteTheme', newTheme);
+            }
+            if(settingsModal) settingsModal.classList.add('hidden');
+        });
+    }
+    // 
 
     // Sidebar Toggle
     const sidebar = document.getElementById('sidebar');
@@ -254,33 +278,71 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- AUTENTICAÇÃO ---
     const authModal = document.getElementById('authModal');
     const closeAuthModalBtn = document.getElementById('closeAuthModalBtn');
+    
+    // Formulários
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
+    const resetPasswordForm = document.getElementById('resetPasswordForm'); // NOVO
+    
+    // Elementos de UI
+    const authTabsContainer = document.getElementById('authTabsContainer');
+    const authModalTitle = document.getElementById('authModalTitle');
     const userGreeting = document.getElementById('userGreeting');
     const logoutButtons = document.querySelectorAll('.sidebar-logout a');
     const profileLinks = document.querySelectorAll('nav a[href="profile.html"]');
 
-    if(closeAuthModalBtn) closeAuthModalBtn.addEventListener('click', () => authModal.classList.add('hidden'));
-
+    // Botões de Navegação Auth
     const loginTabBtn = document.getElementById('loginTabButton');
     const registerTabBtn = document.getElementById('registerTabButton');
+    const forgotPasswordLink = document.getElementById('forgotPasswordLink'); // NOVO
+    const backToLoginBtn = document.getElementById('backToLoginBtn'); // NOVO
+
+    if(closeAuthModalBtn) closeAuthModalBtn.addEventListener('click', () => authModal.classList.add('hidden'));
+
+    // Alternar entre Login e Registo (Abas)
     if(loginTabBtn && registerTabBtn) {
         loginTabBtn.addEventListener('click', () => {
-            loginTabBtn.classList.add('active'); registerTabBtn.classList.remove('active');
-            loginForm.classList.add('active'); registerForm.classList.remove('active');
-            document.getElementById('authModalTitle').textContent = "Aceder à Conta";
+            showLoginForm();
         });
         registerTabBtn.addEventListener('click', () => {
-            registerTabBtn.classList.add('active'); loginTabBtn.classList.remove('active');
-            registerForm.classList.add('active'); loginForm.classList.remove('active');
-            document.getElementById('authModalTitle').textContent = "Criar Nova Conta";
+            loginTabBtn.classList.remove('active'); registerTabBtn.classList.add('active');
+            loginForm.classList.remove('active'); registerForm.classList.add('active'); resetPasswordForm.classList.remove('active');
+            authTabsContainer.classList.remove('hidden'); // Mostra abas
+            authModalTitle.textContent = "Criar Nova Conta";
         });
     }
 
+    // Funções Auxiliares de Navegação Auth
+    function showLoginForm() {
+        loginTabBtn.classList.add('active'); registerTabBtn.classList.remove('active');
+        loginForm.classList.add('active'); registerForm.classList.remove('active'); resetPasswordForm.classList.remove('active');
+        authTabsContainer.classList.remove('hidden'); // Mostra abas
+        authModalTitle.textContent = "Login";
+    }
+
+    function showResetForm() {
+        loginForm.classList.remove('active'); registerForm.classList.remove('active'); resetPasswordForm.classList.add('active');
+        authTabsContainer.classList.add('hidden'); // Esconde abas (foco na recuperação)
+        authModalTitle.textContent = "Recuperar Senha";
+    }
+
+    // Navegação para "Esqueci a Senha"
+    if(forgotPasswordLink) forgotPasswordLink.addEventListener('click', (e) => { e.preventDefault(); showResetForm(); });
+    if(backToLoginBtn) backToLoginBtn.addEventListener('click', (e) => { e.preventDefault(); showLoginForm(); });
+
+    // Monitorar Estado do Usuário + Verificação de Email
     onAuthStateChanged(auth, (user) => {
         if (user) {
             const nome = user.displayName || "Visitante";
-            if(userGreeting) userGreeting.innerHTML = `Olá, <span style="color: var(--text-accent);">${nome}</span>!!`;
+            
+            // Verifica se o email foi confirmado
+            let verificationBadge = "";
+            if (!user.emailVerified) {
+                // Aviso sutil se não verificado (opcional: pode bloquear ações se quiser)
+                verificationBadge = `<span title="Email não verificado" style="color: #ef4444; font-size: 0.8rem; margin-left: 0.5rem; cursor:help;">(Verifique seu email!)</span>`;
+            }
+
+            if(userGreeting) userGreeting.innerHTML = `Olá, <span style="color: var(--text-accent);">${nome}</span>${verificationBadge}!!`;
             profileLinks.forEach(link => link.onclick = null);
             logoutButtons.forEach(btn => btn.parentElement.style.display = 'block');
         } else {
@@ -290,30 +352,88 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // 1. LOGIN
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-            try { await signInWithEmailAndPassword(auth, email, password); authModal.classList.add('hidden'); } 
-            catch (e) { document.getElementById('loginErrorMessage').classList.remove('hidden'); document.getElementById('loginErrorMessage').textContent = "Erro no login: " + e.message; }
+            try { 
+                const userCred = await signInWithEmailAndPassword(auth, email, password); 
+                authModal.classList.add('hidden'); 
+                
+                // Aviso extra se login der certo mas email não for verificado
+                if (!userCred.user.emailVerified) {
+                    alert("Atenção: Seu email ainda não foi verificado. Verifique sua caixa de entrada.");
+                }
+
+            } catch (e) { 
+                document.getElementById('loginErrorMessage').classList.remove('hidden'); 
+                document.getElementById('loginErrorMessage').textContent = "Erro no login: " + e.message; 
+            }
         });
     }
 
+    // 2. REGISTO (Com envio de verificação)
     if (registerForm) {
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
             const username = document.getElementById('registerUsername').value;
+            const errorMsg = document.getElementById('registerErrorMessage');
+
             try {
                 const cred = await createUserWithEmailAndPassword(auth, email, password);
                 if(username) await updateProfile(cred.user, { displayName: username });
+                
+                // ENVIAR EMAIL DE VERIFICAÇÃO
+                await sendEmailVerification(cred.user);
+                
                 authModal.classList.add('hidden');
+                alert(`Conta criada com sucesso! Enviamos um link de verificação para ${email}.`);
+
                 if(userGreeting) userGreeting.innerHTML = `Olá, <span style="color: var(--text-accent);">${username}</span>!!`;
-            } catch (e) { document.getElementById('registerErrorMessage').classList.remove('hidden'); document.getElementById('registerErrorMessage').textContent = "Erro: " + e.message; }
+            } catch (e) { 
+                errorMsg.classList.remove('hidden'); 
+                errorMsg.textContent = "Erro: " + e.message; 
+            }
         });
     }
 
-    logoutButtons.forEach(btn => btn.addEventListener('click', async (e) => { e.preventDefault(); await signOut(auth); window.location.href = "index.html"; }));
+    // 3. RECUPERAÇÃO DE SENHA (NOVO)
+    if (resetPasswordForm) {
+        resetPasswordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('resetEmail').value;
+            const msgSuccess = document.getElementById('resetMessage');
+            const msgError = document.getElementById('resetErrorMessage');
+
+            msgSuccess.classList.add('hidden');
+            msgError.classList.add('hidden');
+
+            try {
+                await sendPasswordResetEmail(auth, email);
+                msgSuccess.textContent = "Email enviado! Verifique sua caixa de entrada (e spam).";
+                msgSuccess.classList.remove('hidden');
+            } catch (error) {
+                console.error(error);
+                msgError.textContent = "Erro: " + error.message;
+                msgError.classList.remove('hidden');
+            }
+        });
+    }
+    if (logoutButtons) {
+        logoutButtons.forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                try {
+                    await signOut(auth);
+                    window.location.href = "index.html";
+                } catch (error) {
+                    console.error("Erro logout:", error);
+                }
+            });
+        });
+    }
 });
