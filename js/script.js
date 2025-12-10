@@ -1,4 +1,4 @@
-import { auth, db } from "./firebase-config.js";
+import { auth } from "./firebase-config.js";
 import { 
     createUserWithEmailAndPassword, 
     signInWithEmailAndPassword, 
@@ -6,7 +6,9 @@ import {
     signOut, 
     updateProfile 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+// IMPORTAÇÃO DO NOVO MÓDULO DE MODAL
+import { openAnimeDetailsModal, initModalListeners } from "./anime-modal.js";
 
 // --- Variáveis Globais de Elementos ---
 const heroCarouselEl = document.getElementById('heroCarousel');
@@ -20,25 +22,13 @@ const themeSwitcher = document.getElementById('themeSwitcher');
 const saveSettingsBtn = document.getElementById('saveSettings');
 const searchInput = document.getElementById('searchInput');
 const searchResultsPreview = document.getElementById('searchResultsPreview');
-const mobileMenuButton = document.getElementById('mobileMenuButton');
-const mobileSidebarOverlay = document.getElementById('mobileSidebarOverlay');
-const mobileSidebar = document.getElementById('mobileSidebar');
-const closeMobileSidebarBtn = document.getElementById('closeMobileSidebar');
-const animeDetailsModal = document.getElementById('animeDetailsModal');
-const animeDetailsModalTitle = document.getElementById('animeDetailsModalTitle');
-const animeDetailsModalImage = document.getElementById('animeDetailsModalImage');
-const closeAnimeDetailsModalBtn = document.getElementById('closeAnimeDetailsModal');
-const animeSynopsisArea = document.getElementById('animeSynopsisArea');
-
-// Variável para guardar o anime atual aberto no modal
-let currentModalAnime = null;
 
 // --- Funções Utilitárias ---
-function getThemeColor(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
 function getDefaultImageOnError(e) { e.target.src = `https://placehold.co/180x270?text=Erro`; }
 function getSearchPreviewImageOnError(e) { e.target.src = `https://placehold.co/40x60?text=X`; }
 function debounce(func, delay = 500) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), delay); }; }
 
+// Helper de duração para o transformApiData
 function parseDuration(durationString) {
     const numbers = durationString.match(/\d+/g);
     if (!numbers) return 24;
@@ -69,74 +59,10 @@ const transformApiData = (apiAnime) => ({
     durationParsed: parseDuration(apiAnime.duration || "24 min")
 });
 
-// --- Lógica de Modais ---
-async function openAnimeDetailsModal(anime) {
-    if (!animeDetailsModal) return;
-    currentModalAnime = anime;
-
-    animeDetailsModalTitle.textContent = anime.title;
-    animeDetailsModalImage.src = anime.imageUrl;
-    animeSynopsisArea.innerHTML = `<p>${anime.fullSynopsis || anime.miniSynopsis}</p>`;
-
-    document.getElementById('animeDetailsModalScore').textContent = anime.score;
-    document.getElementById('animeDetailsModalRank').textContent = anime.rank;
-    document.getElementById('animeDetailsModalSeason').textContent = anime.season;
-    document.getElementById('animeDetailsModalGenres').textContent = anime.genres;
-    document.getElementById('animeDetailsModalUsers').textContent = anime.users || 'N/A';
-
-    animeDetailsModal.classList.remove('hidden');
-
-    // --- Lógica de Biblioteca e Nota ---
-    const actionsDiv = document.getElementById('userAnimeActions');
-    const loginWarning = document.getElementById('loginWarning');
-    const statusSelect = document.getElementById('animeStatusSelect');
-    const episodesInput = document.getElementById('episodesInput');
-    const totalDisplay = document.getElementById('episodesTotalDisplay');
-    const countDisplay = document.getElementById('episodesCountDisplay');
-    const scoreInput = document.getElementById('animeScoreInput'); // Input de Nota
-
-    // Reset visual
-    totalDisplay.textContent = anime.episodes || "?";
-    episodesInput.max = anime.episodes || 9999;
-    
-    const user = auth.currentUser;
-    if (user) {
-        actionsDiv.classList.remove('hidden');
-        loginWarning.classList.add('hidden');
-
-        try {
-            const docRef = doc(db, "users", user.uid, "library", anime.id.toString());
-            const docSnap = await getDoc(docRef);
-
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                statusSelect.value = data.status || "plan_to_watch";
-                episodesInput.value = data.watched_episodes || 0;
-                countDisplay.textContent = data.watched_episodes || 0;
-                if(scoreInput) scoreInput.value = data.personal_score || ""; // Carrega nota
-            } else {
-                statusSelect.value = "plan_to_watch";
-                episodesInput.value = 0;
-                countDisplay.textContent = 0;
-                if(scoreInput) scoreInput.value = "";
-            }
-        } catch (e) {
-            console.error("Erro ao buscar dados do anime:", e);
-        }
-    } else {
-        actionsDiv.classList.add('hidden');
-        loginWarning.classList.remove('hidden');
-    }
-
-    episodesInput.oninput = () => countDisplay.textContent = episodesInput.value;
-}
-
-if (closeAnimeDetailsModalBtn) closeAnimeDetailsModalBtn.addEventListener('click', () => animeDetailsModal.classList.add('hidden'));
-if (closeSettingsModalBtn) closeSettingsModalBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
-
 // --- Lógica de Carrossel ---
 function createAnimeCard(anime) {
     const slideItem = document.createElement('div');
+    // Chama a função importada openAnimeDetailsModal
     slideItem.innerHTML = `<div class="anime-item-wrapper"><img src="${anime.imageUrl}" alt="${anime.title}" class="anime-image-display" onerror="getDefaultImageOnError(event)"><h3 class="anime-title-display" title="${anime.title}">${anime.title}</h3></div>`;
     slideItem.querySelector('.anime-item-wrapper').addEventListener('click', () => openAnimeDetailsModal(anime));
     return slideItem;
@@ -171,6 +97,7 @@ function createHeroSlide(anime) {
             </div>
         </div>
     `;
+    // Chama a função importada
     slide.addEventListener('click', () => openAnimeDetailsModal(anime));
     return slide;
 }
@@ -186,7 +113,7 @@ function initializeHeroCarousel() {
     $(heroCarouselEl).slick({ dots: true, arrows: true, infinite: true, speed: 500, fade: true, cssEase: 'linear', autoplay: true, autoplaySpeed: 5000 });
 }
 
-// --- Lógica de Fetch ---
+// --- Lógica de Fetch e Loading (Com Skeleton) ---
 async function fetchAndDisplayData() {
     showLoadingState(true);
     try {
@@ -216,9 +143,9 @@ async function fetchAndDisplayData() {
 }
 
 function showLoadingState(isLoading) {
-const carousels = [popularAnimesCarouselEl, mostRecentAnimesCarouselEl];
+    const carousels = [popularAnimesCarouselEl, mostRecentAnimesCarouselEl];
     
-    // HTML do Skeleton (5 cards fantasmas)
+    // HTML do Skeleton (Ghost Cards)
     const skeletonHTML = `
         <div class="skeleton-wrapper">
             ${Array(5).fill('').map(() => `
@@ -234,21 +161,16 @@ const carousels = [popularAnimesCarouselEl, mostRecentAnimesCarouselEl];
         if (!carousel) return;
         
         if (isLoading) {
-            // Se já tiver slick inicializado, destruir para mostrar o loading limpo
             if ($(carousel).hasClass('slick-initialized')) {
                 $(carousel).slick('unslick');
             }
             carousel.innerHTML = skeletonHTML;
         } else {
-            // Quando parar de carregar, o populateCarousel vai limpar o HTML, 
-            // então não precisamos remover explicitamente o skeleton aqui,
-            // apenas garantir que não haja "lixo" se estiver vazio.
             const skeletonWrapper = carousel.querySelector('.skeleton-wrapper');
             if (skeletonWrapper) skeletonWrapper.remove();
         }
     });
 
-    // Loading específico para o Hero (apenas um bloco grande)
     if (heroCarouselEl && isLoading) {
         if ($(heroCarouselEl).hasClass('slick-initialized')) $(heroCarouselEl).slick('unslick');
         heroCarouselEl.innerHTML = `
@@ -274,6 +196,7 @@ const handleSearch = async (searchTerm) => {
                 const item = document.createElement('div');
                 item.className = 'search-preview-item';
                 item.innerHTML = `<img src="${anime.imageUrl}" class="search-preview-image" onerror="getSearchPreviewImageOnError(event)"><div class="search-preview-info"><h4 class="search-preview-title">${anime.title}</h4><p class="search-preview-synopsis">${anime.miniSynopsis}</p></div>`;
+                // Chama a função importada
                 item.addEventListener('click', () => { openAnimeDetailsModal(anime); searchResultsPreview.classList.add('hidden'); searchInput.value = ''; });
                 searchResultsPreview.appendChild(item);
             });
@@ -288,6 +211,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.className = `${currentTheme}-theme`;
     if(themeSwitcher) themeSwitcher.value = currentTheme;
     
+    // --- INICIALIZA O MÓDULO DE MODAL (IMPORTANTE) ---
+    initModalListeners();
+
     fetchAndDisplayData();
 
     if (searchInput) {
@@ -390,49 +316,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     logoutButtons.forEach(btn => btn.addEventListener('click', async (e) => { e.preventDefault(); await signOut(auth); window.location.href = "index.html"; }));
-
-    // --- SALVAR NA BIBLIOTECA (Listener Completo) ---
-    const saveToLibraryBtn = document.getElementById('saveToLibraryBtn');
-    if (saveToLibraryBtn) {
-        saveToLibraryBtn.addEventListener('click', async () => {
-            if (!auth.currentUser || !currentModalAnime) return;
-
-            const status = document.getElementById('animeStatusSelect').value;
-            const watched = parseInt(document.getElementById('episodesInput').value) || 0;
-            const scoreElement = document.getElementById('animeScoreInput');
-            
-            // Verifica se o elemento existe antes de pegar o valor
-            const score = scoreElement ? scoreElement.value : null;
-
-            const originalText = saveToLibraryBtn.textContent;
-            saveToLibraryBtn.textContent = "Salvando...";
-            saveToLibraryBtn.disabled = true;
-
-            try {
-                const libraryItem = {
-                    id: currentModalAnime.id,
-                    title: currentModalAnime.title,
-                    imageUrl: currentModalAnime.imageUrl,
-                    total_episodes: currentModalAnime.episodes || 0,
-                    duration_minutes: currentModalAnime.durationParsed || 24,
-                    status: status,
-                    watched_episodes: watched,
-                    personal_score: score ? parseFloat(score) : null,
-                    last_updated: new Date()
-                };
-
-                await setDoc(doc(db, "users", auth.currentUser.uid, "library", currentModalAnime.id.toString()), libraryItem);
-                
-                saveToLibraryBtn.textContent = "Salvo!";
-            } catch (e) {
-                console.error("Erro ao salvar:", e);
-                saveToLibraryBtn.textContent = "Erro :(";
-            }
-
-            setTimeout(() => {
-                saveToLibraryBtn.textContent = originalText;
-                saveToLibraryBtn.disabled = false;
-            }, 2000);
-        });
-    }
 });

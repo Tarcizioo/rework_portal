@@ -166,7 +166,104 @@
     border-radius: 0.5rem;
     margin-top: auto; /* Empurra para o fundo da sidebar se sobrar espaço */
 }
+.auth-modal {
+    max-width: 400px; /* Largura ideal para login */
+    padding: 0; /* Remove padding padrão para controlar layout */
+    overflow: hidden;
+}
 
+/* Área das Abas */
+.auth-tabs {
+    display: flex;
+    padding: 0 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--bg-secondary);
+}
+
+.auth-tab-button {
+    flex: 1;
+    padding: 1rem;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.auth-tab-button:hover {
+    color: var(--text-primary);
+}
+
+.auth-tab-button.active {
+    color: var(--text-accent);
+    border-bottom-color: var(--text-accent);
+}
+
+/* Área dos Formulários */
+.auth-form {
+    padding: 2rem;
+    display: none;
+    animation: fadeInSlide 0.4s ease forwards; /* Animação suave de entrada */
+}
+
+.auth-form.active {
+    display: block;
+}
+
+@keyframes fadeInSlide {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Inputs com Ícones */
+.input-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 1rem;
+    width: 1.2rem;
+    height: 1.2rem;
+    color: var(--text-secondary);
+    transition: color 0.2s;
+}
+
+.form-input.with-icon {
+    padding-left: 3rem; /* Espaço para o ícone */
+}
+
+/* Quando focar no input, pinta o ícone */
+.form-input:focus + .input-icon,
+.input-icon-wrapper:focus-within .input-icon {
+    color: var(--text-accent);
+}
+
+/* Mensagens de Erro */
+.auth-error-message {
+    background-color: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: #ef4444; /* Vermelho alerta */
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 /* Mobile Responsivo */
 @media (max-width: 768px) {
     .anime-details-modal {

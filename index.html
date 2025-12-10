@@ -181,53 +181,78 @@
 
 
 
-    <div id="authModal" class="modal-overlay hidden">
-        <div class="modal-content" style="max-width: 28rem;"> <div class="modal-header">
-                <h3 id="authModalTitle" class="modal-title">Aceder à Conta</h3>
-                <button id="closeAuthModalBtn" class="modal-close-button">
-                    <i data-lucide="x" class="icon"></i>
-                </button>
-            </div>
-            <div class="auth-tabs">
-                <button id="loginTabButton" class="auth-tab-button active" data-form="loginForm">Login</button>
-                <button id="registerTabButton" class="auth-tab-button" data-form="registerForm">Registo</button>
-            </div>
-
-            <form id="loginForm" class="auth-form active">
-                <div class="form-group">
-                    <label for="loginEmail">Email</label>
-                    <input type="email" id="loginEmail" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label for="loginPassword">Palavra-passe</label>
-                    <input type="password" id="loginPassword" class="form-input" required>
-                </div>
-                <p id="loginErrorMessage" class="auth-error-message hidden"></p>
-                <div class="modal-actions" style="justify-content: center;">
-                    <button type="submit" class="button button-accent">Entrar</button>
-                </div>
-            </form>
-
-            <form id="registerForm" class="auth-form">
-                 <div class="form-group">
-                    <label for="registerUsername">Nome de Utilizador (opcional)</label>
-                    <input type="text" id="registerUsername" class="form-input">
-                </div>
-                <div class="form-group">
-                    <label for="registerEmail">Email</label>
-                    <input type="email" id="registerEmail" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label for="registerPassword">Palavra-passe</label>
-                    <input type="password" id="registerPassword" class="form-input" required>
-                </div>
-                <p id="registerErrorMessage" class="auth-error-message hidden"></p>
-                <div class="modal-actions" style="justify-content: center;">
-                    <button type="submit" class="button button-accent">Registar</button>
-                </div>
-            </form>
+<div id="authModal" class="modal-overlay hidden">
+    <div class="modal-content auth-modal">
+        
+        <div class="modal-header" style="border-bottom: none; padding-bottom: 0;">
+            <h3 id="authModalTitle" class="modal-title">Bem-vindo(a)</h3>
+            <button id="closeAuthModalBtn" class="modal-close-button">
+                <i data-lucide="x" class="icon"></i>
+            </button>
         </div>
+
+        <div class="auth-tabs">
+            <button id="loginTabButton" class="auth-tab-button active">Entrar</button>
+            <button id="registerTabButton" class="auth-tab-button">Criar Conta</button>
+        </div>
+
+        <form id="loginForm" class="auth-form active">
+            <div class="form-group">
+                <label for="loginEmail">Email</label>
+                <div class="input-icon-wrapper">
+                    <i data-lucide="mail" class="input-icon"></i>
+                    <input type="email" id="loginEmail" class="form-input with-icon" placeholder="seu@email.com" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Senha</label>
+                <div class="input-icon-wrapper">
+                    <i data-lucide="lock" class="input-icon"></i>
+                    <input type="password" id="loginPassword" class="form-input with-icon" placeholder="••••••••" required>
+                </div>
+            </div>
+            
+            <p id="loginErrorMessage" class="auth-error-message hidden"></p>
+            
+            <button type="submit" class="button button-accent" style="width: 100%; margin-top: 1rem;">
+                Login
+            </button>
+            <p style="text-align: center; margin-top: 1rem; font-size: 0.8rem; color: var(--text-secondary);">
+                Esqueceu a senha? <a href="#" style="color: var(--text-accent);">Recuperar</a>
+            </p>
+        </form>
+
+        <form id="registerForm" class="auth-form">
+            <div class="form-group">
+                <label for="registerUsername">Nome de Utilizador</label>
+                <div class="input-icon-wrapper">
+                    <i data-lucide="user" class="input-icon"></i>
+                    <input type="text" id="registerUsername" class="form-input with-icon" placeholder="Como te chamamos?" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="registerEmail">Email</label>
+                <div class="input-icon-wrapper">
+                    <i data-lucide="mail" class="input-icon"></i>
+                    <input type="email" id="registerEmail" class="form-input with-icon" placeholder="seu@email.com" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="registerPassword">Senha</label>
+                <div class="input-icon-wrapper">
+                    <i data-lucide="lock" class="input-icon"></i>
+                    <input type="password" id="registerPassword" class="form-input with-icon" placeholder="Mínimo 6 caracteres" required>
+                </div>
+            </div>
+
+            <p id="registerErrorMessage" class="auth-error-message hidden"></p>
+
+            <button type="submit" class="button button-accent" style="width: 100%; margin-top: 1rem;">
+                Criar Conta
+            </button>
+        </form>
     </div>
+</div>
 
     <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay hidden">
         <aside id="mobileSidebar" class="mobile-sidebar">
