@@ -216,20 +216,47 @@ async function fetchAndDisplayData() {
 }
 
 function showLoadingState(isLoading) {
-    const carousels = [heroCarouselEl, popularAnimesCarouselEl, mostRecentAnimesCarouselEl];
+const carousels = [popularAnimesCarouselEl, mostRecentAnimesCarouselEl];
+    
+    // HTML do Skeleton (5 cards fantasmas)
+    const skeletonHTML = `
+        <div class="skeleton-wrapper">
+            ${Array(5).fill('').map(() => `
+                <div class="skeleton-card">
+                    <div class="skeleton-image"></div>
+                    <div class="skeleton-text"></div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+
     carousels.forEach(carousel => {
         if (!carousel) return;
-        const loadingMessageEl = carousel.querySelector('.carousel-loading-message');
-        if (isLoading && !loadingMessageEl) {
-            const p = document.createElement('p');
-            p.className = 'carousel-loading-message';
-            p.textContent = 'A carregar...';
-            carousel.innerHTML = '';
-            carousel.appendChild(p);
-        } else if (!isLoading && loadingMessageEl) {
-            loadingMessageEl.remove();
+        
+        if (isLoading) {
+            // Se já tiver slick inicializado, destruir para mostrar o loading limpo
+            if ($(carousel).hasClass('slick-initialized')) {
+                $(carousel).slick('unslick');
+            }
+            carousel.innerHTML = skeletonHTML;
+        } else {
+            // Quando parar de carregar, o populateCarousel vai limpar o HTML, 
+            // então não precisamos remover explicitamente o skeleton aqui,
+            // apenas garantir que não haja "lixo" se estiver vazio.
+            const skeletonWrapper = carousel.querySelector('.skeleton-wrapper');
+            if (skeletonWrapper) skeletonWrapper.remove();
         }
     });
+
+    // Loading específico para o Hero (apenas um bloco grande)
+    if (heroCarouselEl && isLoading) {
+        if ($(heroCarouselEl).hasClass('slick-initialized')) $(heroCarouselEl).slick('unslick');
+        heroCarouselEl.innerHTML = `
+            <div style="height: 350px; width: 100%; background: var(--bg-tertiary); position: relative; overflow: hidden; border-radius: 20px;">
+                <div style="position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent); animation: shimmer 1.5s infinite;"></div>
+                <div style="position: absolute; bottom: 40px; left: 40px; height: 30px; width: 200px; background: var(--bg-secondary); border-radius: 4px;"></div>
+            </div>`;
+    }
 }
 
 // --- Lógica de Pesquisa ---

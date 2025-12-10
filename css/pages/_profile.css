@@ -1,62 +1,71 @@
-/* css/pages/_profile.css */
 .main-content {
     flex: 1;
     background-color: var(--bg-secondary);
-    padding: 2.5rem; /* Padding específico para a página de perfil */
+    padding: 0;
     border-radius: 1rem;
-    box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -2px var(--shadow-color);
-    overflow-y: auto; /* Apenas o conteúdo principal pode rolar */
+    box-shadow: 0 4px 6px -1px var(--shadow-color);
+    overflow-y: auto;
+    position: relative;
 }
 
+/* Banner com gradiente para facilitar leitura */
 .profile-banner {
     position: relative;
-    margin-bottom: 6rem; /* espaço para o avatar sobreposto */
+    margin-bottom: 5rem; 
 }
+
 .banner-image {
     width: 100%;
-    height: 200px;
+    height: 280px; /* Mais alto para dar destaque */
     object-fit: cover;
-    border-radius: 0.5rem;
+    border-radius: 1rem 1rem 0 0;
     background-color: var(--bg-tertiary);
+    /* Máscara suave na parte de baixo para integrar com o fundo */
+    -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
 }
+
 .profile-details {
-    position: relative;
+    position: absolute;
+    bottom: -60px; /* Faz o avatar "invadir" a área de conteúdo */
+    left: 2.5rem;
+    right: 2.5rem;
     display: flex;
-    align-items: flex-end; /* Alinha itens na base */
-    margin-top: -75px; /* Puxa um pouco mais para cima */
-    margin-left: 1rem;
-    gap: 1rem;
+    align-items: flex-end;
+    gap: 1.5rem;
 }
+
 .profile-avatar {
-    width: 120px;
-    height: 120px;
+    width: 140px;
+    height: 140px;
     border-radius: 50%;
-    border: 4px solid var(--bg-secondary);
+    border: 5px solid var(--bg-secondary); /* Borda grossa para separar do fundo */
     object-fit: cover;
     background-color: var(--bg-tertiary);
     flex-shrink: 0;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
 }
+
 .profile-user-info {
-    display: flex;
-    flex-direction: column;
-    padding-bottom: 0.5rem; /* Adiciona espaço na base para alinhar com o avatar */
+    flex: 1;
+    margin-bottom: 1rem; /* Alinha com o centro do avatar */
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8); /* Sombra para ler em cima do banner */
 }
-.profile-user-info-and-button {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-}
+
 #profileUsername {
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: white; /* Sempre branco por causa do banner */
+    letter-spacing: -1px;
+    margin-bottom: 0.25rem;
 }
-#profileHours {
-    font-size: 1rem;
-    color: var(--text-secondary);
-}
-#editProfileBtn {
-    margin-top: 0; /* Removido margin-top */
+
+#profileStats {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.95rem;
+    font-weight: 500;
+    display: flex;
+    gap: 1rem;
 }
 
 /* Seção de Favoritos (na página de perfil) */
@@ -66,10 +75,6 @@
     gap: 1.5rem;
     margin-top: 1rem;
 }
-/* O anime-item-wrapper, anime-image-display e anime-title-display são comuns,
-   mas como você os usa aqui com um grid diferente, mantive a classe wrapper
-   e as classes de imagem/título aqui para clareza. Se forem idênticos aos da home,
-   poderiam ir para um arquivo de componentes de "cards". */
 .anime-item-wrapper {
     background-color: var(--bg-tertiary);
     padding: 0.75rem;
@@ -102,19 +107,39 @@
 
 /* Media queries para a página de perfil no mobile */
 @media (max-width: 768px) {
-    .main-content {
-        border-radius: 0;
-        padding: 1rem;
-        padding-bottom: 5rem; /* Espaço para a sidebar inferior */
-    }
     .profile-details {
         flex-direction: column;
         align-items: center;
         text-align: center;
-        margin-top: -60px;
-        margin-left: 0;
+        bottom: -80px;
+        left: 1rem;
+        right: 1rem;
     }
-    .profile-user-info-and-button {
+    
+    .profile-user-info {
+        text-shadow: none;
+        color: var(--text-primary);
+        margin-bottom: 0;
+    }
+
+    #profileUsername {
+        color: var(--text-primary); /* No mobile, o texto sai do banner */
+        font-size: 1.75rem;
+    }
+    
+    #profileStats {
+        color: var(--text-secondary);
         justify-content: center;
+    }
+
+    .banner-image {
+        height: 180px;
+        -webkit-mask-image: none; /* Remove degrade no mobile */
+        mask-image: none;
+    }
+    
+    #editProfileBtn {
+        width: 100%;
+        margin-top: 1rem;
     }
 }

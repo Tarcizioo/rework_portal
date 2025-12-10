@@ -171,30 +171,55 @@ body {
     opacity: 1;
 }
 .anime-item-wrapper {
-    cursor: pointer;
+    position: relative;
     padding: 0.5rem;
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border-radius: 0.75rem;
 }
+
+.anime-item-wrapper:hover {
+    transform: translateY(-5px) scale(1.02); /* Levanta levemente */
+}
+
+/* Imagem do Card */
 .anime-image-display {
     width: 100%;
-    height: auto;
     aspect-ratio: 2 / 3;
     object-fit: cover;
-    border-radius: 0.5rem;
+    border-radius: 0.75rem;
     margin-bottom: 0.75rem;
-    background-color: var(--bg-tertiary);
-    transition: transform 0.3s ease;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: box-shadow 0.3s ease;
 }
+
 .anime-item-wrapper:hover .anime-image-display {
-    transform: scale(1.05);
+    box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.4); /* Sombra mais forte no hover */
 }
+
+/* Título do Anime */
 .anime-title-display {
-    font-weight: 500;
-    font-size: 0.875rem;
+    font-weight: 600;
+    font-size: 0.95rem;
     text-align: center;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     width: 100%;
+    color: var(--text-primary);
+    opacity: 0.9;
+    transition: color 0.2s;
+}
+
+.anime-item-wrapper:hover .anime-title-display {
+    color: var(--text-accent); /* Título brilha na cor do tema */
+}
+.anime-item-wrapper span, 
+.anime-item-wrapper div[style*="position: absolute"] {
+    backdrop-filter: blur(4px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: 0.5px;
 }
 /* Slick Carousel Overrides */
 .slick-prev, .slick-next {
@@ -277,4 +302,50 @@ body {
     .carousel-section-title {
         font-size: 1.5rem;
     }
+}
+/* SKELETON LOADING (Ghost Cards) */
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.skeleton-wrapper {
+    display: flex;
+    gap: 1rem;
+    overflow: hidden;
+    padding: 0.5rem;
+}
+
+.skeleton-card {
+    min-width: 180px; /* Largura similar ao card real */
+    flex: 0 0 auto;
+}
+
+.skeleton-image {
+    width: 100%;
+    height: 270px;
+    background: #2d333b; /* Cor base escura */
+    background-image: linear-gradient(90deg, #2d333b 25%, #3c444d 50%, #2d333b 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.skeleton-text {
+    height: 1rem;
+    background: #2d333b;
+    background-image: linear-gradient(90deg, #2d333b 25%, #3c444d 50%, #2d333b 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 0.25rem;
+    width: 80%;
+    margin: 0 auto; /* Centralizado */
+}
+
+/* Tema Claro (Inverter cores) */
+.light-theme .skeleton-image,
+.light-theme .skeleton-text {
+    background: #e5e7eb;
+    background-image: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
 }
