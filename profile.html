@@ -98,61 +98,66 @@
     <!-- Main content -->
     <main class="main-content">
       <!-- Banner -->
-      <div class="profile-banner">
-        <img src="https://placehold.co/1200x200?text=Banner" alt="Banner do usuário" class="banner-image">
-        <div class="profile-details">
-          <img src="https://placehold.co/150x150?text=Avatar" alt="Avatar do usuário" class="profile-avatar">
-          <h2 id="profileUsername">Usuário</h2>
-          <p id="profileHours">120h assistidas</p>
-          <button id="editProfileBtn" class="button button-accent">Editar Perfil</button>
+<div class="profile-banner">
+      <img src="https://placehold.co/1200x200?text=Banner" alt="Banner do usuário" class="banner-image">
+      <div class="profile-details">
+        <img src="https://placehold.co/150x150?text=Avatar" alt="Avatar do usuário" class="profile-avatar">
+        <div class="profile-user-info">
+            <h2 id="profileUsername">Usuário</h2>
+            <p id="profileStats" style="color: var(--text-accent); font-weight: 500;">Carregando estatísticas...</p>
         </div>
+        <button id="editProfileBtn" class="button button-accent" style="margin-left: auto;">Editar Perfil</button>
       </div>
-      
-      <div id="settingsModal" class="modal-overlay hidden">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 class="modal-title">Configurações</h3>
-            <button id="closeSettingsModal" class="modal-close-button">
-                <i data-lucide="x" class="icon"></i>
-            </button>
+    </div>
+
+    <section class="carousel-section">
+      <div class="carousel-section-header">
+        <h2 class="carousel-section-title">Top 3 Favoritos</h2>
+        <button id="chooseFavoritesBtn" class="button button-accent" style="font-size: 0.8rem;">Alterar</button>
+      </div>
+      <div id="favoritesContainer" class="favorites-cards">
         </div>
-        <div class="form-group">
-            <label for="themeSwitcher">Mudar Tema:</label>
-            <select id="themeSwitcher" class="form-select">
-                <option value="dark">Escuro</option>
-                <option value="light">Claro</option>
-            </select>
+    </section>
+
+    <section class="carousel-section" style="margin-top: 2rem;">
+        <div class="carousel-section-header">
+            <h2 class="carousel-section-title">Minha Biblioteca</h2>
         </div>
-         <div class="modal-actions">
-            <button id="saveSettings" class="button button-accent">
-                Salvar
-            </button>
+        
+        <div class="library-tabs" style="display: flex; gap: 1rem; margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: 0.5rem;">
+            <button class="button library-tab active" data-status="all">Todos</button>
+            <button class="button library-tab" data-status="watching">Assistindo</button>
+            <button class="button library-tab" data-status="completed">Completos</button>
+            <button class="button library-tab" data-status="plan_to_watch">Planejo</button>
+            <button class="button library-tab" data-status="dropped">Desistidos</button>
+        </div>
+
+        <div id="libraryContainer" class="favorites-cards">
+            <p>Carregando biblioteca...</p>
+        </div>
+    </section>
+     <div id="settingsModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Configurações</h3>
+                <button id="closeSettingsModal" class="modal-close-button">
+                    <i data-lucide="x" class="icon"></i>
+                </button>
+            </div>
+            <div class="form-group">
+                <label for="themeSwitcher">Mudar Tema:</label>
+                <select id="themeSwitcher" class="form-select">
+                    <option value="dark">Escuro</option>
+                    <option value="light">Claro</option>
+                </select>
+            </div>
+             <div class="modal-actions">
+                <button id="saveSettings" class="button button-accent">
+                    Salvar
+                </button>
+            </div>
         </div>
     </div>
-  </div>
-
-      <!-- Favoritos -->
-      <section class="carousel-section">
-        <div class="carousel-section-header">
-          <h2 class="carousel-section-title">Animes Favoritos</h2>
-          <button id="chooseFavoritesBtn" class="button button-accent">Escolher Favoritos</button>
-        </div>
-        <div id="favoritesContainer" class="favorites-cards">
-          <!-- Cards de exemplo -->
-          <div class="anime-item-wrapper">
-            <img src="https://cdn.myanimelist.net/images/anime/13/17405.jpg" alt="Naruto" class="anime-image-display">
-            <h3 class="anime-title-display">Naruto</h3>
-          </div>
-          <div class="anime-item-wrapper">
-            <img src="https://cdn.myanimelist.net/images/anime/1208/94745.jpg" alt="One Piece" class="anime-image-display">
-            <h3 class="anime-title-display">One Piece</h3>
-          </div>
-          <div class="anime-item-wrapper">
-            <img src="https://cdn.myanimelist.net/images/anime/3/40451.jpg" alt="Bleach" class="anime-image-display">
-            <h3 class="anime-title-display">Bleach</h3>
-          </div>
-        </div>
-      </section>
     </main>
   </div>
 

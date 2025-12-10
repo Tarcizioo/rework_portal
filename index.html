@@ -119,6 +119,34 @@
       <!-- Informações -->
         <div class="anime-details-info">
         <div class="anime-meta">
+            <div id="userAnimeActions" class="user-actions hidden">
+    <div class="form-group">
+    <label>Minha Nota (0-10):</label>
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <i data-lucide="star" style="width: 1rem; color: var(--text-accent);"></i>
+        <input type="number" id="animeScoreInput" class="form-input" min="0" max="10" step="0.5" placeholder="-">
+    </div>
+</div>            
+    <div class="form-group">
+        <label></label>
+        <select id="animeStatusSelect" class="form-select">
+            <option value="plan_to_watch">Planejo Assistir</option>
+            <option value="watching">Assistindo</option>
+            <option value="completed">Completo</option>
+            <option value="dropped">Desisti</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Episódios Assistidos: <span id="episodesCountDisplay">0</span> / <span id="episodesTotalDisplay">?</span></label>
+        <input type="number" id="episodesInput" class="form-input" min="0" value="0">
+    </div>
+    <button id="saveToLibraryBtn" class="button button-accent">
+        Salvar na Biblioteca
+    </button>
+</div>
+<div id="loginWarning" class="hidden" style="margin: 1rem 0; color: var(--text-accent);">
+    Faça login para salvar este anime na sua lista!
+</div>
             <div class="status">
           <div><strong>⭐</strong> <span id="animeDetailsModalScore">-</span></div>
           <div><strong>Ranking: #</strong> <span id="animeDetailsModalRank">-</span></div>
