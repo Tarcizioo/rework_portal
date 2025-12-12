@@ -1,310 +1,116 @@
-// js/profile.js
 import { auth, db } from "./firebase-config.js";
 import { doc, getDoc, setDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { openAnimeDetailsModal, initModalListeners } from "./anime-modal.js";
 
-// --- Variáveis Globais ---
-let selectedFavorites = [];
-let fullLibrary = [];
-let currentUser = null;
+let selectedFavorites = []; let fullLibrary = []; let currentUser = null;
 
-// --- Utils ---
-function getBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = error => reject(error);
-  });
-}
+function getBase64(file) { return new Promise((r, j) => { const rd = new FileReader(); rd.readAsDataURL(file); rd.onload = () => r(rd.result); rd.onerror = j; }); }
+function formatTime(min) { if(!min) return "0h"; const d=Math.floor(min/1440), h=Math.floor((min%1440)/60), m=min%60; let p=[]; if(d>0)p.push(`${d}d`); if(h>0)p.push(`${h}h`); if(m>0&&d===0)p.push(`${m}m`); return p.join(' ') + " (" + min.toLocaleString() + " min)"; }
+function applyTheme(t) { document.body.className = `${t}-theme`; const s = document.getElementById('themeSwitcher'); if(s) s.value = t; }
 
-function formatTime(totalMinutes) {
-    if (!totalMinutes) return "0h assistidas";
-    const days = Math.floor(totalMinutes / 1440);
-    const hours = Math.floor((totalMinutes % 1440) / 60);
-    const minutes = totalMinutes % 60;
-    
-    let parts = [];
-    if (days > 0) parts.push(`${days}d`);
-    if (hours > 0) parts.push(`${hours}h`);
-    if (minutes > 0 && days === 0) parts.push(`${minutes}m`);
-    return parts.join(' ') + " (" + totalMinutes.toLocaleString() + " min)";
-}
+async function getUserData(uid) { const d = await getDoc(doc(db, "users", uid)); return d.exists() ? d.data() : null; }
+async function getUserLibrary(uid) { const s = await getDocs(collection(db, "users", uid, "library")); return s.docs.map(d => d.data()); }
+async function saveUserData(d) { if(!currentUser) return alert("Login!"); await setDoc(doc(db, "users", currentUser.uid), d, {merge:true}); renderProfileHeader(); renderFavorites(); }
 
-function applyTheme(theme) {
-    document.body.className = `${theme}-theme`;
-    const themeSwitcher = document.getElementById('themeSwitcher');
-    if (themeSwitcher) themeSwitcher.value = theme;
-}
-
-// --- Funções de Banco de Dados ---
-async function getUserData(uid) {
-    const docRef = doc(db, "users", uid);
-    const docSnap = await getDoc(docRef);
-    return docSnap.exists() ? docSnap.data() : null;
-}
-
-async function getUserLibrary(uid) {
-    const libRef = collection(db, "users", uid, "library");
-    const snapshot = await getDocs(libRef);
-    return snapshot.docs.map(doc => doc.data());
-}
-
-async function saveUserData(data) {
-    if (!currentUser) return alert("Faça login!");
-    try {
-        await setDoc(doc(db, "users", currentUser.uid), data, { merge: true });
-        renderProfileHeader(); 
-        renderFavorites();     
-    } catch (e) { console.error("Erro ao salvar:", e); }
-}
-
-// --- Renderização ---
 async function renderProfileHeader() {
     const data = await getUserData(currentUser.uid);
-    const usernameDisplay = document.getElementById("profileUsername");
-    if (usernameDisplay) usernameDisplay.textContent = (data && data.username) || currentUser.displayName || "Usuário";
-    if (data) {
-        if (data.avatar) document.querySelector(".profile-avatar").src = data.avatar;
-        if (data.banner) document.querySelector(".banner-image").src = data.banner;
-        selectedFavorites = data.favorites || [];
-    }
+    const n = document.getElementById("profileUsername"); if(n) n.textContent = (data && data.username) || currentUser.displayName || "Usuário";
+    if (data) { if(data.avatar) document.querySelector(".profile-avatar").src = data.avatar; if(data.banner) document.querySelector(".banner-image").src = data.banner; selectedFavorites = data.favorites || []; }
 }
 
 async function renderLibraryAndStats() {
     fullLibrary = await getUserLibrary(currentUser.uid);
-    
-    let totalMinutes = 0;
-    let totalEpisodes = 0;
-    fullLibrary.forEach(anime => {
-        const eps = parseInt(anime.watched_episodes) || 0;
-        const dur = parseInt(anime.duration_minutes) || 24;
-        totalEpisodes += eps;
-        totalMinutes += (eps * dur);
-    });
-
-    const statsEl = document.getElementById("profileStats");
-    if(statsEl) {
-        // Verifica se lucide está carregado
-        const iconTv = typeof lucide !== 'undefined' ? '<i data-lucide="tv" style="width:1rem; vertical-align: middle;"></i>' : '📺';
-        const iconClock = typeof lucide !== 'undefined' ? '<i data-lucide="clock" style="width:1rem; vertical-align: middle;"></i>' : '⏰';
-        
-        statsEl.innerHTML = `${iconTv} ${totalEpisodes} eps <br>${iconClock} ${formatTime(totalMinutes)}`;
-        if (typeof lucide !== 'undefined') lucide.createIcons();
-    }
+    let tm = 0, te = 0; fullLibrary.forEach(a => { const e = parseInt(a.watched_episodes)||0; te+=e; tm+=(e*(parseInt(a.duration_minutes)||24)); });
+    const s = document.getElementById("profileStats"); if(s) { const ic = typeof lucide!=='undefined'; s.innerHTML = `${ic?'<i data-lucide="tv" style="width:1rem;vertical-align:middle"></i>':'📺'} ${te} eps <br>${ic?'<i data-lucide="clock" style="width:1rem;vertical-align:middle"></i>':'⏰'} ${formatTime(tm)}`; if(ic) lucide.createIcons(); }
     filterAndRenderLibrary(document.querySelector('.library-tab.active')?.dataset.status || 'all');
 }
 
 function filterAndRenderLibrary(status) {
-    const container = document.getElementById("libraryContainer");
-    if(!container) return;
-    container.innerHTML = "";
-
-    let filtered = fullLibrary;
-    if (status !== 'all') filtered = fullLibrary.filter(anime => anime.status === status);
-
-    if (filtered.length === 0) {
-        container.innerHTML = "<p style='color: var(--text-secondary); width: 100%; text-align: center; margin-top: 1rem;'>Nenhum anime nesta lista.</p>";
-        return;
-    }
-
-    filtered.forEach(anime => {
-        const card = document.createElement("div");
-        card.className = "anime-item-wrapper";
-        card.addEventListener('click', () => openAnimeDetailsModal(anime));
-
-        const progress = `${anime.watched_episodes || 0}/${anime.total_episodes || '?'}`;
-        const scoreBadge = anime.personal_score ? `<div style="position: absolute; bottom: 5px; left: 5px; background: rgba(0,0,0,0.8); color: #FFD700; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold;">★ ${anime.personal_score}</div>` : '';
-
-        card.innerHTML = `
-            <div style="position: relative;">
-                <img src="${anime.imageUrl}" class="anime-image-display" onerror="this.src='https://placehold.co/150x225?text=Img'" style="margin-bottom: 0.25rem;">
-                <span style="position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.8); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem;">${progress}</span>
-                ${scoreBadge}
-            </div>
-            <h3 class="anime-title-display">${anime.title}</h3>
-        `;
-        container.appendChild(card);
+    const c = document.getElementById("libraryContainer"); if(!c) return; c.innerHTML = "";
+    let f = fullLibrary; if (status !== 'all') f = fullLibrary.filter(a => a.status === status);
+    if (f.length === 0) { c.innerHTML = "<p style='color:var(--text-secondary);width:100%;text-align:center;'>Vazio.</p>"; return; }
+    f.forEach(a => {
+        const d = document.createElement("div"); d.className = "anime-item-wrapper"; d.addEventListener('click', () => openAnimeDetailsModal(a));
+        const sc = a.personal_score ? `<div style="position:absolute;bottom:5px;left:5px;background:rgba(0,0,0,0.8);color:#FFD700;padding:2px 6px;border-radius:4px;font-size:0.7rem;font-weight:bold;">★ ${a.personal_score}</div>` : '';
+        d.innerHTML = `<div style="position:relative;"><img src="${a.imageUrl}" class="anime-image-display"><span style="position:absolute;top:5px;right:5px;background:rgba(0,0,0,0.8);color:white;padding:2px 6px;border-radius:4px;font-size:0.7rem;">${a.watched_episodes||0}/${a.total_episodes||'?'}</span>${sc}</div><h3 class="anime-title-display">${a.title}</h3>`;
+        c.appendChild(d);
     });
 }
 
 function renderFavorites() {
-    const container = document.getElementById("favoritesContainer");
-    if(!container) return;
-    container.innerHTML = "";
-    if (selectedFavorites.length > 0) {
-        selectedFavorites.forEach(anime => {
-            const card = document.createElement("div");
-            card.className = "anime-item-wrapper";
-            card.addEventListener('click', () => openAnimeDetailsModal(anime));
-            card.innerHTML = `<img src="${anime.imageUrl}" class="anime-image-display"><h3 class="anime-title-display">${anime.title}</h3>`;
-            container.appendChild(card);
-        });
-    } else {
-        container.innerHTML = "<p>Sem favoritos.</p>";
-    }
+    const c = document.getElementById("favoritesContainer"); if(!c) return; c.innerHTML = "";
+    if (selectedFavorites.length > 0) selectedFavorites.forEach(a => { const d = document.createElement("div"); d.className = "anime-item-wrapper"; d.addEventListener('click', () => openAnimeDetailsModal(a)); d.innerHTML = `<img src="${a.imageUrl}" class="anime-image-display"><h3 class="anime-title-display">${a.title}</h3>`; c.appendChild(d); });
+    else c.innerHTML = "<p>Sem favoritos.</p>";
 }
 
-// --- Funções de Modal de Edição (Cópia simples para funcionar) ---
-async function saveProfile() {
-  const username = document.getElementById('profileNameInput').value;
-  const avatarFile = document.getElementById('profileAvatarInput').files[0];
-  const bannerFile = document.getElementById('profileBannerInput').files[0];
-  let profileData = { username: username || (currentUser ? currentUser.displayName : "Usuário") };
-  if (avatarFile) profileData.avatar = await getBase64(avatarFile);
-  if (bannerFile) profileData.banner = await getBase64(bannerFile);
-  await saveUserData(profileData);
-  document.getElementById('editProfileModal').classList.add('hidden');
+// Event handlers
+async function saveProfile() { const u = document.getElementById('profileNameInput').value; const a = document.getElementById('profileAvatarInput').files[0]; const b = document.getElementById('profileBannerInput').files[0]; let d = { username: u || currentUser.displayName }; if(a) d.avatar = await getBase64(a); if(b) d.banner = await getBase64(b); await saveUserData(d); document.getElementById('editProfileModal').classList.add('hidden'); }
+async function searchFavorites(q) {
+    const r = document.getElementById("favoritesSearchResults"); if(q.length<3){r.classList.add("hidden");return;} r.classList.remove("hidden");
+    try { const res = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(q)}&limit=5`); const d = await res.json(); r.innerHTML = ""; d.data.forEach(a => { const i = document.createElement("div"); i.className = "search-preview-item"; i.innerHTML = `<img src="${a.images.jpg.image_url}" class="search-preview-image"><div><h4>${a.title}</h4></div>`; i.onclick = () => addFavorite({id:a.mal_id, title:a.title, imageUrl:a.images.jpg.image_url}); r.appendChild(i); }); } catch(e){}
 }
-
-async function searchFavorites(query) {
-    const favoritesSearchResults = document.getElementById("favoritesSearchResults");
-    if (query.length < 3) { favoritesSearchResults.classList.add("hidden"); return; }
-    favoritesSearchResults.classList.remove("hidden");
-    try {
-        const res = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&limit=5`);
-        const data = await res.json();
-        favoritesSearchResults.innerHTML = "";
-        data.data.forEach(anime => {
-            const item = document.createElement("div");
-            item.className = "search-preview-item";
-            item.innerHTML = `<img src="${anime.images.jpg.image_url}" class="search-preview-image"><div class="search-preview-info"><h4>${anime.title}</h4></div>`;
-            item.onclick = () => addFavorite({ id: anime.mal_id, title: anime.title, imageUrl: anime.images.jpg.image_url });
-            favoritesSearchResults.appendChild(item);
-        });
-    } catch(e) { console.error(e); }
-}
-
-function addFavorite(anime) {
-    if (selectedFavorites.length >= 3) return alert("Máximo 3!");
-    if (!selectedFavorites.find(f => f.id === anime.id)) {
-        selectedFavorites.push(anime);
-        renderSelectedFavoritesPreview();
-    }
-}
-window.removeFavorite = function(id) {
-    selectedFavorites = selectedFavorites.filter(f => f.id !== id);
-    renderSelectedFavoritesPreview();
-}
+function addFavorite(a) { if(selectedFavorites.length>=3) return alert("Max 3!"); if(!selectedFavorites.find(f=>f.id===a.id)){selectedFavorites.push(a);renderSelectedFavoritesPreview();} }
+window.removeFavorite = function(id) { selectedFavorites = selectedFavorites.filter(f=>f.id!==id); renderSelectedFavoritesPreview(); }
 function renderSelectedFavoritesPreview() {
     const container = document.getElementById("selectedFavorites");
     container.innerHTML = "";
+    
+    // Se não tiver favoritos, mostra slots vazios para indicar que cabe 3
+    if (selectedFavorites.length === 0) {
+        container.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); padding: 2rem; border: 2px dashed var(--border-color); border-radius: 0.75rem;">
+                <p>Nenhum favorito selecionado.</p>
+                <p style="font-size: 0.8rem;">Pesquise acima para adicionar (Máx. 3)</p>
+            </div>
+        `;
+        return;
+    }
+
     selectedFavorites.forEach(anime => {
         const div = document.createElement('div');
         div.className = "anime-item-wrapper";
-        div.innerHTML = `<img src="${anime.imageUrl}" class="anime-image-display" style="width:100px;"><h5>${anime.title}</h5><button class="button" onclick="window.removeFavorite(${anime.id})">Remover</button>`;
+        
+        // Estrutura HTML limpa para o card do favorito
+        div.innerHTML = `
+            <button onclick="window.removeFavorite(${anime.id})" title="Remover">✕</button>
+            <img src="${anime.imageUrl}" class="anime-image-display">
+            <h5>${anime.title}</h5>
+        `;
         container.appendChild(div);
     });
 }
-
-// --- INICIALIZAÇÃO E EVENT LISTENERS DO PERFIL ---
 document.addEventListener('DOMContentLoaded', () => {
     if (typeof lucide !== 'undefined') lucide.createIcons();
-    const savedTheme = localStorage.getItem('animeSiteTheme') || 'dark';
-    applyTheme(savedTheme);
+    applyTheme(localStorage.getItem('animeSiteTheme') || 'dark');
+    initModalListeners(); window.addEventListener('libraryUpdated', renderLibraryAndStats);
 
-    // 1. Inicializar Modal de Animes
-    initModalListeners(); 
+    const sidebar = document.getElementById('sidebar'); const toggle = document.getElementById('toggleSidebarBtn'); if(toggle) toggle.addEventListener('click', () => sidebar.classList.toggle('collapsed'));
     
-    // Atualizar se houver mudança
-    window.addEventListener('libraryUpdated', () => {
-        renderLibraryAndStats(); 
+    // Auth
+    onAuthStateChanged(auth, async (u) => {
+        if(u) { currentUser=u; await renderProfileHeader(); renderFavorites(); renderLibraryAndStats(); }
+        else window.location.href="index.html";
     });
 
-    // 2. SIDEBAR TOGGLE (Correção da Barra Lateral)
-    const sidebar = document.getElementById('sidebar');
-    const toggleBtn = document.getElementById('toggleSidebarBtn');
-    if(toggleBtn) {
-        toggleBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('collapsed');
-        });
-    }
+    // Settings
+    const settingsModal=document.getElementById('settingsModal'); const closeSettings=document.getElementById('closeSettingsModal'); const saveSettings=document.getElementById('saveSettings'); const themeS=document.getElementById('themeSwitcher');
+    if(document.getElementById('settingsLink')) document.getElementById('settingsLink').addEventListener('click',(e)=>{e.preventDefault();settingsModal.classList.remove('hidden');});
+    if(closeSettings) { const nc = closeSettings.cloneNode(true); closeSettings.parentNode.replaceChild(nc, closeSettings); nc.addEventListener('click', ()=>settingsModal.classList.add('hidden')); }
+    if(saveSettings) saveSettings.addEventListener('click', ()=>{ if(themeS){const t=themeS.value;document.body.className=`${t}-theme`;localStorage.setItem('animeSiteTheme',t);} settingsModal.classList.add('hidden'); });
 
-    // 3. LOGOUT (Correção do Botão de Sair)
-    // Tenta pegar tanto o link da sidebar desktop quanto mobile
-    const logoutBtns = document.querySelectorAll('.sidebar-logout a, .logout-link'); 
-    logoutBtns.forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            try {
-                await signOut(auth);
-                window.location.href = "index.html";
-            } catch (error) {
-                console.error("Erro logout:", error);
-            }
-        });
-    });
+    // Tabs
+    const tabs=document.querySelectorAll('.library-tab'); tabs.forEach(t=>{ t.addEventListener('click',()=>{ tabs.forEach(x=>x.classList.remove('active')); t.classList.add('active'); filterAndRenderLibrary(t.dataset.status); }); });
 
-    // 4. SETTINGS / CONFIGURAÇÕES (Correção do Modal de Tema)
-    const settingsModal = document.getElementById('settingsModal');
-    const settingsLink = document.getElementById('settingsLink');
-    const closeSettingsModalBtn = document.getElementById('closeSettingsModal');
-    const saveSettingsBtn = document.getElementById('saveSettings');
-    const themeSwitcher = document.getElementById('themeSwitcher');
-
-    if(settingsLink) {
-        settingsLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            if(settingsModal) settingsModal.classList.remove('hidden');
-        });
-    }
-    if(closeSettingsModalBtn) {
-        closeSettingsModalBtn.addEventListener('click', () => {
-            if(settingsModal) settingsModal.classList.add('hidden');
-        });
-    }
-    if(saveSettingsBtn) {
-        saveSettingsBtn.addEventListener('click', () => {
-            if(themeSwitcher) {
-                const newTheme = themeSwitcher.value;
-                localStorage.setItem('animeSiteTheme', newTheme);
-                applyTheme(newTheme);
-            }
-            if(settingsModal) settingsModal.classList.add('hidden');
-        });
-    }
-
-    // 5. Abas da Biblioteca
-    const tabs = document.querySelectorAll('.library-tab');
-    tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            tabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            filterAndRenderLibrary(tab.dataset.status);
-        });
-    });
-
-    // 6. Autenticação e Carregamento Inicial
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            currentUser = user;
-            await renderProfileHeader();
-            renderFavorites();
-            renderLibraryAndStats();
-        } else {
-            window.location.href = "index.html";
-        }
-    });
-    
-    // 7. Eventos do Perfil (Editar/Favoritos)
-    document.getElementById("editProfileBtn")?.addEventListener("click", async () => {
-        const data = await getUserData(currentUser.uid);
-        if(data) document.getElementById('profileNameInput').value = data.username || '';
-        document.getElementById("editProfileModal").classList.remove("hidden");
-    });
-    document.getElementById("closeEditProfileModal")?.addEventListener("click", () => document.getElementById("editProfileModal").classList.add("hidden"));
+    // Modals
+    document.getElementById("editProfileBtn")?.addEventListener("click",async()=>{ const d=await getUserData(currentUser.uid); if(d)document.getElementById('profileNameInput').value=d.username||''; document.getElementById("editProfileModal").classList.remove("hidden"); });
+    document.getElementById("closeEditProfileModal")?.addEventListener("click",()=>document.getElementById("editProfileModal").classList.add("hidden"));
     document.getElementById("saveProfileBtn")?.addEventListener("click", saveProfile);
+    document.getElementById("chooseFavoritesBtn")?.addEventListener("click",()=>{renderSelectedFavoritesPreview();document.getElementById("favoritesModal").classList.remove("hidden");});
+    document.getElementById("closeFavoritesModal")?.addEventListener("click",()=>document.getElementById("favoritesModal").classList.add("hidden"));
+    document.getElementById("saveFavoritesBtn")?.addEventListener("click",async()=>{await saveUserData({favorites:selectedFavorites});document.getElementById("favoritesModal").classList.add("hidden");});
+    document.getElementById("favoritesSearchInput")?.addEventListener("input",(e)=>searchFavorites(e.target.value));
     
-    document.getElementById("chooseFavoritesBtn")?.addEventListener("click", () => {
-        renderSelectedFavoritesPreview();
-        document.getElementById("favoritesModal").classList.remove("hidden");
-    });
-    document.getElementById("closeFavoritesModal")?.addEventListener("click", () => document.getElementById("favoritesModal").classList.add("hidden"));
-    document.getElementById("saveFavoritesBtn")?.addEventListener("click", async () => {
-        await saveUserData({ favorites: selectedFavorites });
-        document.getElementById("favoritesModal").classList.add("hidden");
-    });
-
-    document.getElementById("favoritesSearchInput")?.addEventListener("input", (e) => searchFavorites(e.target.value));
+    // Logout
+    document.querySelectorAll('.sidebar-logout a, .logout-link').forEach(b => b.addEventListener('click', async(e)=>{e.preventDefault(); await signOut(auth); window.location.href="index.html";}));
 });

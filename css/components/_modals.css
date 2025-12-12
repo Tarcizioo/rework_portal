@@ -7,19 +7,19 @@
     justify-content: center;
     padding: 1rem;
     z-index: 60;
-    backdrop-filter: blur(4px); 
+    backdrop-filter: blur(4px);
 }
 
 .modal-content {
     background-color: var(--bg-secondary);
-    padding: 1rem; 
+    padding: 1rem;
     border-radius: 0.75rem;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
     width: 100%;
     max-width: 32rem;
     display: flex;
     flex-direction: column;
-    max-height: 90vh; 
+    max-height: 90vh;
     position: relative;
     border: 1px solid var(--border-color);
 }
@@ -36,7 +36,7 @@
 }
 
 .modal-title {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-weight: 700;
     color: var(--text-primary);
 }
@@ -49,6 +49,9 @@
     padding: 0.5rem;
     border-radius: 0.5rem;
     transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .modal-close-button:hover {
@@ -56,122 +59,18 @@
     background-color: var(--bg-tertiary);
 }
 
-/* --- ESTILOS ESPECÍFICOS DO MODAL DE ANIME (TAMANHO FIXO) --- */
-.anime-details-modal {
-    max-width: 1600px !important; 
-    width: 90%;
-    height: auto; 
+.modal-actions {
+    padding: 1.5rem;
     display: flex;
-    flex-direction: column;
-}
-
-.anime-details-body {
-    display: flex;
-    flex-direction: row;
-    gap: 2rem;
-    padding: 2rem;
-    height: 100%;
-    overflow: hidden; /* O corpo não rola, só o conteúdo interno se precisar */
-}
-
-/* Área da Esquerda (Poster e Ações) */
-.anime-details-sidebar {
-    width: 280px;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.anime-details-modal-image {
-    width: 100%;
-    height: 400px; /* Altura fixa para poster */
-    object-fit: cover;
-    border-radius: 0.5rem;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-}
-
-/* Área da Direita (Infos e Sinopse) */
-.anime-details-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+    justify-content: flex-end;
     gap: 1rem;
-    overflow-y: auto; /* Scroll apenas aqui se o texto for grande */
-    padding-right: 0.5rem; /* Espaço para a barra de rolagem */
 }
 
-/* Custom Scrollbar para o modal */
-.anime-details-content::-webkit-scrollbar {
-    width: 8px;
-}
-.anime-details-content::-webkit-scrollbar-track {
-    background: var(--bg-tertiary);
-    border-radius: 4px;
-}
-.anime-details-content::-webkit-scrollbar-thumb {
-    background: var(--text-secondary);
-    border-radius: 4px;
-}
+.hidden { display: none !important; }
 
-.anime-meta-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 1rem;
-    background-color: var(--bg-tertiary);
-    padding: 1rem;
-    border-radius: 0.5rem;
-    margin-bottom: 1rem;
-}
+/* --- 2. MODAL DE AUTENTICAÇÃO --- */
+.auth-modal { max-width: 400px; overflow: hidden; }
 
-.meta-item strong {
-    display: block;
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    margin-bottom: 0.25rem;
-}
-.meta-item span {
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.tags {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    margin-bottom: 1rem;
-}
-
-.tag {
-    background-color: var(--bg-tertiary);
-    color: var(--text-accent);
-    padding: 0.25rem 0.75rem;
-    border-radius: 1rem;
-    font-size: 0.85rem;
-    font-weight: 500;
-    border: 1px solid var(--border-color);
-}
-
-.synopsis-area {
-    line-height: 1.6;
-    color: var(--text-secondary);
-    font-size: 1rem;
-}
-
-/* Ações do Usuário (Botões de Salvar/Nota) */
-.user-actions {
-    background-color: var(--bg-tertiary);
-    padding: 1rem;
-    border-radius: 0.5rem;
-    margin-top: auto; 
-}
-.auth-modal {
-    max-width: 400px; 
-    padding: 0; 
-    overflow: hidden;
-}
-
-/* Área das Abas */
 .auth-tabs {
     display: flex;
     padding: 0 1.5rem;
@@ -192,68 +91,26 @@
     transition: all 0.3s ease;
 }
 
-.auth-tab-button:hover {
-    color: var(--text-primary);
-}
+.auth-tab-button:hover { color: var(--text-primary); }
+.auth-tab-button.active { color: var(--text-accent); border-bottom-color: var(--text-accent); }
 
-.auth-tab-button.active {
-    color: var(--text-accent);
-    border-bottom-color: var(--text-accent);
-}
-
-/* Área dos Formulários */
-.auth-form {
-    padding: 2rem;
-    display: none;
-    animation: fadeInSlide 0.4s ease forwards; /* Animação suave de entrada */
-}
-
-.auth-form.active {
-    display: block;
-}
+.auth-form { padding: 2rem; display: none; animation: fadeInSlide 0.4s ease forwards; }
+.auth-form.active { display: block; }
 
 @keyframes fadeInSlide {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-/* Inputs com Ícones */
-.input-icon-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
+.input-icon-wrapper { position: relative; display: flex; align-items: center; }
+.input-icon { position: absolute; left: 1rem; width: 1.2rem; height: 1.2rem; color: var(--text-secondary); transition: color 0.2s; }
+.form-input.with-icon { padding-left: 3rem; }
+.form-input:focus + .input-icon, .input-icon-wrapper:focus-within .input-icon { color: var(--text-accent); }
 
-.input-icon {
-    position: absolute;
-    left: 1rem;
-    width: 1.2rem;
-    height: 1.2rem;
-    color: var(--text-secondary);
-    transition: color 0.2s;
-}
-
-.form-input.with-icon {
-    padding-left: 3rem; /* Espaço para o ícone */
-}
-
-/* Quando focar no input, pinta o ícone */
-.form-input:focus + .input-icon,
-.input-icon-wrapper:focus-within .input-icon {
-    color: var(--text-accent);
-}
-
-/* Mensagens de Erro */
 .auth-error-message {
     background-color: rgba(239, 68, 68, 0.1);
     border: 1px solid rgba(239, 68, 68, 0.2);
-    color: #ef4444; /* Vermelho alerta */
+    color: #ef4444;
     padding: 0.75rem;
     border-radius: 0.5rem;
     margin-top: 1rem;
@@ -263,34 +120,217 @@
     align-items: center;
     justify-content: center;
 }
-/* Mobile Responsivo */
-@media (max-width: 768px) {
-    .anime-details-modal {
-        height: 90vh; /* No mobile ocupa quase toda a tela */
-        max-width: 95% !important;
-    }
-    
-    .anime-details-body {
-        flex-direction: column;
-        overflow-y: auto; /* No mobile rola tudo */
-        padding: 1rem;
-    }
 
-    .anime-details-sidebar {
-        width: 100%;
-        flex-direction: row; /* Poster e botões lado a lado no mobile */
-        flex-wrap: wrap;
-        align-items: flex-start;
-    }
-
-    .anime-details-modal-image {
-        width: 140px;
-        height: 200px;
-    }
-
-    .anime-details-content {
-        overflow: visible;
-    }
+/* --- 3. MODAL DE DETALHES DO ANIME --- */
+.anime-details-modal {
+    max-width: 1820px !important;
+    width: 90%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
 }
 
-.hidden { display: none !important; }
+.anime-details-body {
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+    padding: 2rem;
+    height: 100%;
+    overflow: hidden; 
+}
+
+.anime-details-sidebar {
+    width: 280px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.anime-details-modal-image {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.anime-details-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+/* Scrollbar */
+.anime-details-content::-webkit-scrollbar, .anime-details-sidebar::-webkit-scrollbar { width: 6px; }
+.anime-details-content::-webkit-scrollbar-track, .anime-details-sidebar::-webkit-scrollbar-track { background: var(--bg-tertiary); border-radius: 3px; }
+.anime-details-content::-webkit-scrollbar-thumb, .anime-details-sidebar::-webkit-scrollbar-thumb { background: var(--text-secondary); border-radius: 3px; }
+
+/* Meta Grid */
+.anime-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+    background-color: var(--bg-tertiary);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.meta-item strong { display: block; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.25rem; }
+.meta-item span { font-weight: 600; color: var(--text-primary); }
+
+/* TAGS (ESTILO NOVO) */
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 1.25rem;
+}
+
+.tag {
+    background-color: rgba(150, 30, 242, 0.08);
+    color: var(--text-accent);
+    border: 1px solid rgba(150, 30, 242, 0.25);
+    padding: 0.35rem 0.85rem;
+    border-radius: 50px;
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: default;
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.tag:hover {
+    background-color: var(--text-accent);
+    color: #ffffff;
+    border-color: var(--text-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(150, 30, 242, 0.4);
+}
+
+/* Abas Sinopse/Trailer */
+.modal-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-tab {
+    background: none;
+    border: none;
+    padding: 0.5rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s;
+}
+
+.modal-tab:hover { color: var(--text-primary); }
+.modal-tab.active { color: var(--text-accent); }
+.modal-tab.active::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 2px; background-color: var(--text-accent); }
+
+.synopsis-area { line-height: 1.6; color: var(--text-secondary); font-size: 1rem; }
+
+.trailer-area { width: 100%; aspect-ratio: 16 / 9; background-color: black; border-radius: 0.5rem; overflow: hidden; }
+.trailer-area iframe { width: 100%; height: 100%; border: none; }
+
+.content-tab.hidden { display: none; }
+.content-tab.active { display: block; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* --- 4. PAINEL DE AÇÕES (MODERNO) --- */
+#userAnimeActions {
+    background-color: var(--bg-tertiary);
+    padding: 1.25rem;
+    border-radius: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-top: auto;
+}
+
+#userAnimeActions label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.action-input-container {
+    background-color: var(--bg-primary);
+    border: 2px solid transparent;
+    border-radius: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.action-input-container:focus-within {
+    border-color: var(--text-accent);
+    box-shadow: 0 0 0 3px rgba(150, 30, 242, 0.15);
+    background-color: var(--bg-secondary);
+}
+
+.action-input-container select, .action-input-container input {
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    width: 100%;
+    font-family: 'Lexend', sans-serif;
+    font-weight: 500;
+    font-size: 0.95rem;
+    outline: none;
+    padding: 0;
+    margin: 0;
+}
+
+.action-input-container select { cursor: pointer; }
+.input-suffix { font-size: 0.8rem; color: var(--text-secondary); white-space: nowrap; font-weight: 400; }
+.score-icon { color: #FFD700; filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.3)); }
+
+#saveToLibraryBtn {
+    width: 100%;
+    margin-top: 0.5rem;
+    padding: 0.85rem;
+    font-size: 1rem;
+    border-radius: 0.75rem;
+    background: var(--text-accent);
+    color: white;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+    box-shadow: 0 4px 6px rgba(150, 30, 242, 0.3);
+}
+
+#saveToLibraryBtn:hover { opacity: 0.9; transform: translateY(-1px); }
+#saveToLibraryBtn:active { transform: scale(0.98); }
+
+#loginWarning { margin-top: 1rem; text-align: center; padding: 1rem; background-color: rgba(150, 30, 242, 0.1); border-radius: 0.5rem; color: var(--text-accent); font-weight: 500; }
+
+@media (max-width: 768px) {
+    .anime-details-modal { height: 90vh; max-width: 95% !important; }
+    .anime-details-body { flex-direction: column; overflow-y: auto; padding: 1rem; }
+    .anime-details-sidebar { width: 100%; flex-direction: column; gap: 1.5rem; overflow: visible; padding-right: 0; }
+    .anime-details-modal-image { width: 160px; height: 240px; margin: 0 auto; display: block; }
+    .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+}

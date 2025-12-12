@@ -1,18 +1,8 @@
-import { auth } from "./firebase-config.js";
-import { 
-    createUserWithEmailAndPassword, 
-    signInWithEmailAndPassword, 
-    onAuthStateChanged, 
-    signOut, 
-    updateProfile,
-    sendPasswordResetEmail,
-    sendEmailVerification
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
-// IMPORTAÇÃO DO NOVO MÓDULO DE MODAL
+import { auth, db } from "./firebase-config.js";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile, sendPasswordResetEmail, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { openAnimeDetailsModal, initModalListeners } from "./anime-modal.js";
 
-// --- Variáveis Globais de Elementos ---
+// DOM Elements
 const heroCarouselEl = document.getElementById('heroCarousel');
 const popularAnimesCarouselEl = document.getElementById('popularAnimesCarousel');
 const mostRecentAnimesCarouselEl = document.getElementById('mostRecentAnimesCarousel');
@@ -25,27 +15,18 @@ const saveSettingsBtn = document.getElementById('saveSettings');
 const searchInput = document.getElementById('searchInput');
 const searchResultsPreview = document.getElementById('searchResultsPreview');
 
-// --- Funções Utilitárias ---
+// Utils
 function getDefaultImageOnError(e) { e.target.src = `https://placehold.co/180x270?text=Erro`; }
 function getSearchPreviewImageOnError(e) { e.target.src = `https://placehold.co/40x60?text=X`; }
 function debounce(func, delay = 500) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), delay); }; }
-
-// Helper de duração para o transformApiData
 function parseDuration(durationString) {
-    const numbers = durationString.match(/\d+/g);
-    if (!numbers) return 24;
-    
+    const numbers = durationString.match(/\d+/g); if (!numbers) return 24;
     let minutes = 0;
-    if (durationString.includes("hr")) {
-        minutes += parseInt(numbers[0]) * 60;
-        if (numbers[1]) minutes += parseInt(numbers[1]);
-    } else {
-        minutes = parseInt(numbers[0]);
-    }
+    if (durationString.includes("hr")) { minutes += parseInt(numbers[0]) * 60; if (numbers[1]) minutes += parseInt(numbers[1]); } 
+    else { minutes = parseInt(numbers[0]); }
     return minutes || 24;
 }
 
-// --- Transformação de Dados da API ---
 const transformApiData = (apiAnime) => ({
     id: apiAnime.mal_id,
     title: apiAnime.title_english || apiAnime.title,
@@ -53,169 +34,87 @@ const transformApiData = (apiAnime) => ({
     genres: (apiAnime.genres || []).map(g => g.name).join(', '),
     miniSynopsis: (apiAnime.synopsis || "Sinopse não disponível.").substring(0, 250) + '...',
     fullSynopsis: apiAnime.synopsis || "Sinopse não disponível.",
-    score: apiAnime.score || "N/A",
-    rank: apiAnime.rank || "N/A",
+    score: apiAnime.score || "N/A", rank: apiAnime.rank || "N/A",
     season: apiAnime.season ? `${apiAnime.season.charAt(0).toUpperCase() + apiAnime.season.slice(1)} ${apiAnime.year}` : "Desconhecido",
     episodes: apiAnime.episodes || 0,
-    duration: apiAnime.duration || "24 min",
-    durationParsed: parseDuration(apiAnime.duration || "24 min")
+    duration: apiAnime.duration || "24 min", durationParsed: parseDuration(apiAnime.duration || "24 min"),
+    trailerUrl: apiAnime.trailer?.embed_url || null
 });
 
-// --- Lógica de Carrossel ---
+// Carousel Logic
 function createAnimeCard(anime) {
     const slideItem = document.createElement('div');
-    // Chama a função importada openAnimeDetailsModal
-    slideItem.innerHTML = `<div class="anime-item-wrapper"><img src="${anime.imageUrl}" alt="${anime.title}" class="anime-image-display" onerror="getDefaultImageOnError(event)"><h3 class="anime-title-display" title="${anime.title}">${anime.title}</h3></div>`;
+    slideItem.innerHTML = `<div class="anime-item-wrapper"><img src="${anime.imageUrl}" class="anime-image-display" onerror="getDefaultImageOnError(event)"><h3 class="anime-title-display">${anime.title}</h3></div>`;
     slideItem.querySelector('.anime-item-wrapper').addEventListener('click', () => openAnimeDetailsModal(anime));
     return slideItem;
 }
-
 function populateCarousel(element, animes) {
     if (!element) return;
     if ($(element).hasClass('slick-initialized')) $(element).slick('unslick');
-    element.innerHTML = '';
-    animes.forEach(anime => element.appendChild(createAnimeCard(anime)));
+    element.innerHTML = ''; animes.forEach(anime => element.appendChild(createAnimeCard(anime)));
 }
-
 function initializeSlickCarousel(selector) {
     $(selector).slick({ dots: true, infinite: true, speed: 300, slidesToShow: 5, slidesToScroll: 5, responsive: [{ breakpoint: 1380, settings: { slidesToShow: 4, slidesToScroll: 4 } }, { breakpoint: 1024, settings: { slidesToShow: 3, slidesToScroll: 3 } }, { breakpoint: 768, settings: { slidesToShow: 2, slidesToScroll: 2, dots: false } }, { breakpoint: 480, settings: { slidesToShow: 2, slidesToScroll: 2, dots: false } }] });
 }
 
-// --- Lógica do Hero Carousel ---
+// Hero Logic
 function createHeroSlide(anime) {
     const slide = document.createElement('div');
     slide.className = 'hero-slide';
-    slide.innerHTML = `
-        <div class="hero-background-image" style="background-image: url('${anime.imageUrl}')"></div>
-        <div class="hero-overlay"></div>
-        <div class="hero-content">
-            <div class="hero-poster">
-                <img src="${anime.imageUrl}" alt="Poster de ${anime.title}" onerror="getDefaultImageOnError(event)">
-            </div>
-            <div class="hero-info">
-                <h2>${anime.title}</h2>
-                <p class="genres">${anime.genres}</p>
-                <p class="synopsis">${anime.miniSynopsis}</p>
-            </div>
-        </div>
-    `;
-    // Chama a função importada
+    slide.innerHTML = `<div class="hero-background-image" style="background-image: url('${anime.imageUrl}')"></div><div class="hero-overlay"></div><div class="hero-content"><div class="hero-poster"><img src="${anime.imageUrl}" onerror="getDefaultImageOnError(event)"></div><div class="hero-info"><h2>${anime.title}</h2><p class="genres">${anime.genres}</p><p class="synopsis">${anime.miniSynopsis}</p></div></div>`;
     slide.addEventListener('click', () => openAnimeDetailsModal(anime));
     return slide;
 }
+function populateHeroCarousel(animes) { if (!heroCarouselEl) return; heroCarouselEl.innerHTML = ''; animes.forEach(anime => heroCarouselEl.appendChild(createHeroSlide(anime))); }
+function initializeHeroCarousel() { if (!heroCarouselEl || $(heroCarouselEl).hasClass('slick-initialized')) return; $(heroCarouselEl).slick({ dots: true, arrows: true, infinite: true, speed: 500, fade: true, cssEase: 'linear', autoplay: true, autoplaySpeed: 5000 }); }
 
-function populateHeroCarousel(animes) {
-    if (!heroCarouselEl) return;
-    heroCarouselEl.innerHTML = '';
-    animes.forEach(anime => heroCarouselEl.appendChild(createHeroSlide(anime)));
-}
-
-function initializeHeroCarousel() {
-    if (!heroCarouselEl || $(heroCarouselEl).hasClass('slick-initialized')) return;
-    $(heroCarouselEl).slick({ dots: true, arrows: true, infinite: true, speed: 500, fade: true, cssEase: 'linear', autoplay: true, autoplaySpeed: 5000 });
-}
-
-// --- Lógica de Fetch e Loading (Com Skeleton) ---
+// Fetch & Loading
 async function fetchAndDisplayData() {
     showLoadingState(true);
     try {
-        const popularPromise = fetch("https://api.jikan.moe/v4/top/anime?limit=15");
-        const recentPromise = fetch("https://api.jikan.moe/v4/seasons/now?limit=15");
-        const [popularResponse, recentResponse] = await Promise.all([popularPromise, recentPromise]);
-        
-        const popularData = await popularResponse.json();
-        const recentData = await recentResponse.json();
-        
-        const popularAnimes = popularData.data.map(transformApiData);
-        const recentAnimes = recentData.data.map(transformApiData);
-
-        populateHeroCarousel(popularAnimes.slice(0, 5));
-        initializeHeroCarousel();
-
-        populateCarousel(popularAnimesCarouselEl, popularAnimes);
-        initializeSlickCarousel('#popularAnimesCarousel');
-        populateCarousel(mostRecentAnimesCarouselEl, recentAnimes);
-        initializeSlickCarousel('#mostRecentAnimesCarousel');
-
-    } catch (error) {
-        console.error("Erro ao carregar dados:", error);
-    } finally {
-        showLoadingState(false);
-    }
+        const [popularResponse, recentResponse] = await Promise.all([fetch("https://api.jikan.moe/v4/top/anime?limit=15"), fetch("https://api.jikan.moe/v4/seasons/now?limit=15")]);
+        const popularData = await popularResponse.json(); const recentData = await recentResponse.json();
+        const popularAnimes = popularData.data.map(transformApiData); const recentAnimes = recentData.data.map(transformApiData);
+        populateHeroCarousel(popularAnimes.slice(0, 5)); initializeHeroCarousel();
+        populateCarousel(popularAnimesCarouselEl, popularAnimes); initializeSlickCarousel('#popularAnimesCarousel');
+        populateCarousel(mostRecentAnimesCarouselEl, recentAnimes); initializeSlickCarousel('#mostRecentAnimesCarousel');
+    } catch (error) { console.error("Erro dados:", error); } finally { showLoadingState(false); }
 }
 
 function showLoadingState(isLoading) {
     const carousels = [popularAnimesCarouselEl, mostRecentAnimesCarouselEl];
-    
-    // HTML do Skeleton (Ghost Cards)
-    const skeletonHTML = `
-        <div class="skeleton-wrapper">
-            ${Array(5).fill('').map(() => `
-                <div class="skeleton-card">
-                    <div class="skeleton-image"></div>
-                    <div class="skeleton-text"></div>
-                </div>
-            `).join('')}
-        </div>
-    `;
-
-    carousels.forEach(carousel => {
-        if (!carousel) return;
-        
-        if (isLoading) {
-            if ($(carousel).hasClass('slick-initialized')) {
-                $(carousel).slick('unslick');
-            }
-            carousel.innerHTML = skeletonHTML;
-        } else {
-            const skeletonWrapper = carousel.querySelector('.skeleton-wrapper');
-            if (skeletonWrapper) skeletonWrapper.remove();
-        }
-    });
-
-    if (heroCarouselEl && isLoading) {
-        if ($(heroCarouselEl).hasClass('slick-initialized')) $(heroCarouselEl).slick('unslick');
-        heroCarouselEl.innerHTML = `
-            <div style="height: 350px; width: 100%; background: var(--bg-tertiary); position: relative; overflow: hidden; border-radius: 20px;">
-                <div style="position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent); animation: shimmer 1.5s infinite;"></div>
-                <div style="position: absolute; bottom: 40px; left: 40px; height: 30px; width: 200px; background: var(--bg-secondary); border-radius: 4px;"></div>
-            </div>`;
-    }
+    const skeletonHTML = `<div class="skeleton-wrapper">${Array(5).fill('').map(() => `<div class="skeleton-card"><div class="skeleton-image"></div><div class="skeleton-text"></div></div>`).join('')}</div>`;
+    carousels.forEach(c => { if(c) { if(isLoading) { if($(c).hasClass('slick-initialized')) $(c).slick('unslick'); c.innerHTML = skeletonHTML; } else { const sk = c.querySelector('.skeleton-wrapper'); if(sk) sk.remove(); } } });
+    if (heroCarouselEl && isLoading) { if($(heroCarouselEl).hasClass('slick-initialized')) $(heroCarouselEl).slick('unslick'); heroCarouselEl.innerHTML = `<div style="height:350px;width:100%;background:var(--bg-tertiary);position:relative;border-radius:20px;"><div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.05),transparent);animation:shimmer 1.5s infinite;"></div></div>`; }
 }
 
-// --- Lógica de Pesquisa ---
+// Search
 const handleSearch = async (searchTerm) => {
     if (searchTerm.length < 3) { searchResultsPreview.classList.add('hidden'); return; }
-    searchResultsPreview.innerHTML = `<p style="padding: 0.75rem; text-align: center;">A pesquisar...</p>`;
-    searchResultsPreview.classList.remove('hidden');
+    searchResultsPreview.innerHTML = `<p style="padding:0.75rem;text-align:center;">A pesquisar...</p>`; searchResultsPreview.classList.remove('hidden');
     try {
         const response = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(searchTerm)}&limit=5`);
-        const searchData = await response.json();
-        searchResultsPreview.innerHTML = ''; 
+        const searchData = await response.json(); searchResultsPreview.innerHTML = ''; 
         if (searchData.data && searchData.data.length > 0) {
             searchData.data.forEach(animeData => {
                 const anime = transformApiData(animeData);
-                const item = document.createElement('div');
-                item.className = 'search-preview-item';
-                item.innerHTML = `<img src="${anime.imageUrl}" class="search-preview-image" onerror="getSearchPreviewImageOnError(event)"><div class="search-preview-info"><h4 class="search-preview-title">${anime.title}</h4><p class="search-preview-synopsis">${anime.miniSynopsis}</p></div>`;
-                // Chama a função importada
+                const item = document.createElement('div'); item.className = 'search-preview-item';
+                item.innerHTML = `<img src="${anime.imageUrl}" class="search-preview-image"><div class="search-preview-info"><h4 class="search-preview-title">${anime.title}</h4></div>`;
                 item.addEventListener('click', () => { openAnimeDetailsModal(anime); searchResultsPreview.classList.add('hidden'); searchInput.value = ''; });
                 searchResultsPreview.appendChild(item);
             });
-        } else { searchResultsPreview.innerHTML = `<p style="padding: 0.75rem; text-align: center;">Nenhum resultado.</p>`; }
-    } catch (error) { console.error("Erro na busca:", error); searchResultsPreview.innerHTML = `<p style="padding: 0.75rem; text-align: center;">Erro ao buscar.</p>`; }
+        } else { searchResultsPreview.innerHTML = `<p style="padding:0.75rem;text-align:center;">Nenhum resultado.</p>`; }
+    } catch (e) { searchResultsPreview.innerHTML = `<p>Erro.</p>`; }
 };
 
-// --- Inicialização e Event Listeners ---
+// INIT
 document.addEventListener('DOMContentLoaded', () => {
     if (typeof lucide !== 'undefined') lucide.createIcons();
     const currentTheme = localStorage.getItem('animeSiteTheme') || 'dark';
     document.body.className = `${currentTheme}-theme`;
     if(themeSwitcher) themeSwitcher.value = currentTheme;
     
-    // --- INICIALIZA O MÓDULO DE MODAL (IMPORTANTE) ---
     initModalListeners();
-
     fetchAndDisplayData();
 
     if (searchInput) {
@@ -224,12 +123,15 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('click', (e) => { if (searchInput.parentElement && !searchInput.parentElement.contains(e.target)) searchResultsPreview.classList.add('hidden'); });
     }
     
-    // Auth & Sidebar Mobile
-    const mobileMenuButton = document.getElementById('mobileMenuButton');
-    const closeMobileSidebarBtn = document.getElementById('closeMobileSidebar');
-    const mobileSidebarOverlay = document.getElementById('mobileSidebarOverlay');
-    const mobileSidebar = document.getElementById('mobileSidebar');
-    
+    // Auth & Mobile Sidebar
+    const authModal = document.getElementById('authModal');
+    const closeAuthModalBtn = document.getElementById('closeAuthModalBtn');
+    const loginForm = document.getElementById('loginForm'); const registerForm = document.getElementById('registerForm'); const resetPasswordForm = document.getElementById('resetPasswordForm');
+    const authTabsContainer = document.getElementById('authTabsContainer'); const authModalTitle = document.getElementById('authModalTitle');
+    const loginTabBtn = document.getElementById('loginTabButton'); const registerTabBtn = document.getElementById('registerTabButton');
+    const userGreeting = document.getElementById('userGreeting'); const logoutButtons = document.querySelectorAll('.sidebar-logout a'); const profileLinks = document.querySelectorAll('nav a[href="profile.html"]');
+
+    const mobileMenuButton = document.getElementById('mobileMenuButton'); const mobileSidebarOverlay = document.getElementById('mobileSidebarOverlay'); const mobileSidebar = document.getElementById('mobileSidebar'); const closeMobileSidebarBtn = document.getElementById('closeMobileSidebar');
     function openMobileNav() { if (mobileSidebarOverlay) mobileSidebarOverlay.classList.remove('hidden'); if (mobileSidebar) setTimeout(() => mobileSidebar.classList.add('open'), 10); }
     function closeMobileNav() { if (mobileSidebar) mobileSidebar.classList.remove('open'); if (mobileSidebarOverlay) setTimeout(() => mobileSidebarOverlay.classList.add('hidden'), 300); }
     if (mobileMenuButton) mobileMenuButton.addEventListener('click', openMobileNav);
@@ -237,203 +139,44 @@ document.addEventListener('DOMContentLoaded', () => {
     if (mobileSidebarOverlay) mobileSidebarOverlay.addEventListener('click', (e) => { if (e.target === mobileSidebarOverlay) closeMobileNav(); });
 
     // Settings
-    if (settingsLink) {
-        settingsLink.addEventListener('click', (e) => { 
-            e.preventDefault(); 
-            if(settingsModal) settingsModal.classList.remove('hidden'); 
-        });
-    }
+    function openSettings(e) { if(e) e.preventDefault(); if(settingsModal) settingsModal.classList.remove('hidden'); closeMobileNav(); }
+    function closeSettings() { if(settingsModal) settingsModal.classList.add('hidden'); }
+    if(settingsLink) settingsLink.addEventListener('click', openSettings);
+    if(settingsLinkMobile) settingsLinkMobile.addEventListener('click', openSettings);
+    if(closeSettingsModalBtn) { const newClose = closeSettingsModalBtn.cloneNode(true); closeSettingsModalBtn.parentNode.replaceChild(newClose, closeSettingsModalBtn); newClose.addEventListener('click', closeSettings); }
+    if(saveSettingsBtn) saveSettingsBtn.addEventListener('click', () => {
+        if(themeSwitcher) { const t = themeSwitcher.value; document.body.className = `${t}-theme`; localStorage.setItem('animeSiteTheme', t); }
+        closeSettings();
+    });
 
-    if (settingsLinkMobile) {
-        settingsLinkMobile.addEventListener('click', (e) => { 
-            e.preventDefault(); 
-            closeMobileNav(); // Fecha o menu mobile antes de abrir o modal
-            if(settingsModal) settingsModal.classList.remove('hidden'); 
-        });
-    }
-
-    if (closeSettingsModalBtn) {
-        closeSettingsModalBtn.addEventListener('click', () => {
-            if(settingsModal) settingsModal.classList.add('hidden');
-        });
-    }
-
-    if (saveSettingsBtn) {
-        saveSettingsBtn.addEventListener('click', () => {
-            if(themeSwitcher) {
-                const newTheme = themeSwitcher.value;
-                document.body.className = `${newTheme}-theme`;
-                localStorage.setItem('animeSiteTheme', newTheme);
-            }
-            if(settingsModal) settingsModal.classList.add('hidden');
-        });
-    }
-    // 
-
-    // Sidebar Toggle
-    const sidebar = document.getElementById('sidebar');
-    const toggleBtn = document.getElementById('toggleSidebarBtn');
+    // Sidebar Desktop
+    const sidebar = document.getElementById('sidebar'); const toggleBtn = document.getElementById('toggleSidebarBtn');
     if(toggleBtn) toggleBtn.addEventListener('click', () => sidebar.classList.toggle('collapsed'));
 
-    // --- AUTENTICAÇÃO ---
-    const authModal = document.getElementById('authModal');
-    const closeAuthModalBtn = document.getElementById('closeAuthModalBtn');
-    
-    // Formulários
-    const loginForm = document.getElementById('loginForm');
-    const registerForm = document.getElementById('registerForm');
-    const resetPasswordForm = document.getElementById('resetPasswordForm'); // NOVO
-    
-    // Elementos de UI
-    const authTabsContainer = document.getElementById('authTabsContainer');
-    const authModalTitle = document.getElementById('authModalTitle');
-    const userGreeting = document.getElementById('userGreeting');
-    const logoutButtons = document.querySelectorAll('.sidebar-logout a');
-    const profileLinks = document.querySelectorAll('nav a[href="profile.html"]');
-
-    // Botões de Navegação Auth
-    const loginTabBtn = document.getElementById('loginTabButton');
-    const registerTabBtn = document.getElementById('registerTabButton');
-    const forgotPasswordLink = document.getElementById('forgotPasswordLink'); // NOVO
-    const backToLoginBtn = document.getElementById('backToLoginBtn'); // NOVO
-
+    // Auth Logic
     if(closeAuthModalBtn) closeAuthModalBtn.addEventListener('click', () => authModal.classList.add('hidden'));
-
-    // Alternar entre Login e Registo (Abas)
+    function showLoginForm() { loginTabBtn.classList.add('active'); registerTabBtn.classList.remove('active'); loginForm.classList.add('active'); registerForm.classList.remove('active'); resetPasswordForm.classList.remove('active'); authTabsContainer.classList.remove('hidden'); authModalTitle.textContent = "Aceder à Conta"; }
     if(loginTabBtn && registerTabBtn) {
-        loginTabBtn.addEventListener('click', () => {
-            showLoginForm();
-        });
-        registerTabBtn.addEventListener('click', () => {
-            loginTabBtn.classList.remove('active'); registerTabBtn.classList.add('active');
-            loginForm.classList.remove('active'); registerForm.classList.add('active'); resetPasswordForm.classList.remove('active');
-            authTabsContainer.classList.remove('hidden'); // Mostra abas
-            authModalTitle.textContent = "Criar Nova Conta";
-        });
+        loginTabBtn.addEventListener('click', showLoginForm);
+        registerTabBtn.addEventListener('click', () => { loginTabBtn.classList.remove('active'); registerTabBtn.classList.add('active'); loginForm.classList.remove('active'); registerForm.classList.add('active'); resetPasswordForm.classList.remove('active'); authTabsContainer.classList.remove('hidden'); authModalTitle.textContent = "Criar Nova Conta"; });
     }
+    const forgotLink = document.getElementById('forgotPasswordLink'); const backLogin = document.getElementById('backToLoginBtn');
+    if(forgotLink) forgotLink.addEventListener('click', (e)=>{e.preventDefault(); loginForm.classList.remove('active'); registerForm.classList.remove('active'); resetPasswordForm.classList.add('active'); authTabsContainer.classList.add('hidden'); authModalTitle.textContent="Recuperar Senha";});
+    if(backLogin) backLogin.addEventListener('click', (e)=>{e.preventDefault(); showLoginForm();});
 
-    // Funções Auxiliares de Navegação Auth
-    function showLoginForm() {
-        loginTabBtn.classList.add('active'); registerTabBtn.classList.remove('active');
-        loginForm.classList.add('active'); registerForm.classList.remove('active'); resetPasswordForm.classList.remove('active');
-        authTabsContainer.classList.remove('hidden'); // Mostra abas
-        authModalTitle.textContent = "Login";
-    }
-
-    function showResetForm() {
-        loginForm.classList.remove('active'); registerForm.classList.remove('active'); resetPasswordForm.classList.add('active');
-        authTabsContainer.classList.add('hidden'); // Esconde abas (foco na recuperação)
-        authModalTitle.textContent = "Recuperar Senha";
-    }
-
-    // Navegação para "Esqueci a Senha"
-    if(forgotPasswordLink) forgotPasswordLink.addEventListener('click', (e) => { e.preventDefault(); showResetForm(); });
-    if(backToLoginBtn) backToLoginBtn.addEventListener('click', (e) => { e.preventDefault(); showLoginForm(); });
-
-    // Monitorar Estado do Usuário + Verificação de Email
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            const nome = user.displayName || "Visitante";
-            
-            // Verifica se o email foi confirmado
-            let verificationBadge = "";
-            if (!user.emailVerified) {
-                // Aviso sutil se não verificado (opcional: pode bloquear ações se quiser)
-                verificationBadge = `<span title="Email não verificado" style="color: #ef4444; font-size: 0.8rem; margin-left: 0.5rem; cursor:help;">(Verifique seu email!)</span>`;
-            }
-
-            if(userGreeting) userGreeting.innerHTML = `Olá, <span style="color: var(--text-accent);">${nome}</span>${verificationBadge}!!`;
-            profileLinks.forEach(link => link.onclick = null);
-            logoutButtons.forEach(btn => btn.parentElement.style.display = 'block');
+            const v = !user.emailVerified ? `<span style="color:#ef4444;font-size:0.8rem;margin-left:0.5rem;" title="Verifique seu email">(Verifique email!)</span>` : "";
+            if(userGreeting) userGreeting.innerHTML = `Olá, <span style="color:var(--text-accent);">${user.displayName || "Visitante"}</span>${v}!!`;
+            profileLinks.forEach(l => l.onclick = null); logoutButtons.forEach(b => b.parentElement.style.display = 'block');
         } else {
             if(userGreeting) userGreeting.textContent = "Olá, Visitante!!";
-            profileLinks.forEach(link => { link.onclick = (e) => { e.preventDefault(); authModal.classList.remove('hidden'); }; });
-            logoutButtons.forEach(btn => btn.parentElement.style.display = 'none');
+            profileLinks.forEach(l => l.onclick = (e) => { e.preventDefault(); authModal.classList.remove('hidden'); }); logoutButtons.forEach(b => b.parentElement.style.display = 'none');
         }
     });
 
-    // 1. LOGIN
-    if (loginForm) {
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            try { 
-                const userCred = await signInWithEmailAndPassword(auth, email, password); 
-                authModal.classList.add('hidden'); 
-                
-                // Aviso extra se login der certo mas email não for verificado
-                if (!userCred.user.emailVerified) {
-                    alert("Atenção: Seu email ainda não foi verificado. Verifique sua caixa de entrada.");
-                }
-
-            } catch (e) { 
-                document.getElementById('loginErrorMessage').classList.remove('hidden'); 
-                document.getElementById('loginErrorMessage').textContent = "Erro no login: " + e.message; 
-            }
-        });
-    }
-
-    // 2. REGISTO (Com envio de verificação)
-    if (registerForm) {
-        registerForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('registerEmail').value;
-            const password = document.getElementById('registerPassword').value;
-            const username = document.getElementById('registerUsername').value;
-            const errorMsg = document.getElementById('registerErrorMessage');
-
-            try {
-                const cred = await createUserWithEmailAndPassword(auth, email, password);
-                if(username) await updateProfile(cred.user, { displayName: username });
-                
-                // ENVIAR EMAIL DE VERIFICAÇÃO
-                await sendEmailVerification(cred.user);
-                
-                authModal.classList.add('hidden');
-                alert(`Conta criada com sucesso! Enviamos um link de verificação para ${email}.`);
-
-                if(userGreeting) userGreeting.innerHTML = `Olá, <span style="color: var(--text-accent);">${username}</span>!!`;
-            } catch (e) { 
-                errorMsg.classList.remove('hidden'); 
-                errorMsg.textContent = "Erro: " + e.message; 
-            }
-        });
-    }
-
-    // 3. RECUPERAÇÃO DE SENHA (NOVO)
-    if (resetPasswordForm) {
-        resetPasswordForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('resetEmail').value;
-            const msgSuccess = document.getElementById('resetMessage');
-            const msgError = document.getElementById('resetErrorMessage');
-
-            msgSuccess.classList.add('hidden');
-            msgError.classList.add('hidden');
-
-            try {
-                await sendPasswordResetEmail(auth, email);
-                msgSuccess.textContent = "Email enviado! Verifique sua caixa de entrada (e spam).";
-                msgSuccess.classList.remove('hidden');
-            } catch (error) {
-                console.error(error);
-                msgError.textContent = "Erro: " + error.message;
-                msgError.classList.remove('hidden');
-            }
-        });
-    }
-    if (logoutButtons) {
-        logoutButtons.forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                try {
-                    await signOut(auth);
-                    window.location.href = "index.html";
-                } catch (error) {
-                    console.error("Erro logout:", error);
-                }
-            });
-        });
-    }
+    if (loginForm) loginForm.addEventListener('submit', async (e) => { e.preventDefault(); try { await signInWithEmailAndPassword(auth, document.getElementById('loginEmail').value, document.getElementById('loginPassword').value); authModal.classList.add('hidden'); } catch (e) { document.getElementById('loginErrorMessage').classList.remove('hidden'); document.getElementById('loginErrorMessage').textContent = "Erro: " + e.message; } });
+    if (registerForm) registerForm.addEventListener('submit', async (e) => { e.preventDefault(); try { const c = await createUserWithEmailAndPassword(auth, document.getElementById('registerEmail').value, document.getElementById('registerPassword').value); await updateProfile(c.user, {displayName: document.getElementById('registerUsername').value}); await sendEmailVerification(c.user); authModal.classList.add('hidden'); alert("Verifique seu email!"); } catch (e) { document.getElementById('registerErrorMessage').classList.remove('hidden'); document.getElementById('registerErrorMessage').textContent = e.message; } });
+    if (resetPasswordForm) resetPasswordForm.addEventListener('submit', async (e) => { e.preventDefault(); try { await sendPasswordResetEmail(auth, document.getElementById('resetEmail').value); document.getElementById('resetMessage').classList.remove('hidden'); document.getElementById('resetMessage').textContent = "Link enviado!"; } catch (e) { document.getElementById('resetErrorMessage').classList.remove('hidden'); document.getElementById('resetErrorMessage').textContent = e.message; } });
+    logoutButtons.forEach(btn => btn.addEventListener('click', async (e) => { e.preventDefault(); await signOut(auth); window.location.href = "index.html"; }));
 });

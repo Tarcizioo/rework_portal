@@ -7,119 +7,73 @@
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <script src="https://unpkg.com/lucide@0.378.0/dist/umd/lucide.min.js" defer></script>
-  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick.css"/>
-  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick-theme.css"/>
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Lexend:wght@100..900&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/lucide@0.378.0/dist/umd/lucide.min.js" defer></script>
 </head>
 <body class="dark-theme">
 
   <div class="app-container">
-    <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
-        <div class="sidebar-title">nome</div>
+        <div class="sidebar-title">Portal</div>
         <button id="toggleSidebarBtn" class="toggle-sidebar-btn">
             <i data-lucide="chevron-left" class="icon"></i>
         </button>
       </div>
       <nav>
-        <a href="index.html" class="nav-link"><i data-lucide="home" class="icon"></i><span>Home</span></a>
-        <a href="#" class="nav-link"><i data-lucide="bar-chart-2" class="icon"></i><span>Populares</span></a>
-        <a href="#" class="nav-link"><i data-lucide="calendar-clock" class="icon"></i><span>Lançamentos</span></a>
-        <a href="#" id="settingsLink" class="nav-link"><i data-lucide="settings" class="icon"></i><span>Configurações</span></a>
-        <a href="profile.html" class="nav-link active"><i data-lucide="user" class="icon"></i><span>Perfil</span></a>
+        <a href="index.html" class="nav-link">
+            <i data-lucide="home" class="icon"></i>
+            <span>Home</span>
+        </a>
+        <a href="index.html" class="nav-link">
+            <i data-lucide="bar-chart-2" class="icon"></i>
+            <span>Populares</span>
+        </a>
+        <a href="index.html" class="nav-link">
+            <i data-lucide="calendar-clock" class="icon"></i>
+            <span>Lançamentos</span>
+        </a>
+        <a href="#" id="settingsLink" class="nav-link">
+            <i data-lucide="settings" class="icon"></i>
+            <span>Configurações</span>
+        </a>
+        <a href="profile.html" class="nav-link active">
+            <i data-lucide="user" class="icon"></i>
+            <span>Perfil</span>
+        </a>
       </nav>
       <div class="sidebar-logout">
-        <a href="#" class="nav-link">
+        <a href="#" class="nav-link logout-link">
           <i data-lucide="log-out" class="icon"></i>
-          <span>Logout</span>
+          <span>Sair</span>
         </a>
-    </div>
-
+      </div>
     </aside>
-<!-- Modal Editar Perfil -->
-<div id="editProfileModal" class="modal-overlay hidden">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3 class="modal-title">Editar Perfil</h3>
-      <button id="closeEditProfileModal" class="modal-close-button">
-        <i data-lucide="x" class="icon"></i>
-      </button>
-    </div>
-    <div class="form-group">
-      <label for="profileNameInput">Nome de usuário</label>
-      <input type="text" id="profileNameInput" class="form-input" placeholder="Seu nome">
-    </div>
-    <div class="form-group">
-      <label for="profileAvatarInput">Foto de Perfil</label>
-      <input type="file" id="profileAvatarInput" class="form-input" accept="image/*">
-    </div>
-    <div class="form-group">
-      <label for="profileBannerInput">Banner</label>
-      <input type="file" id="profileBannerInput" class="form-input" accept="image/*">
-    </div>
-    <div class="modal-actions">
-      <button id="saveProfileBtn" class="button button-accent">Salvar</button>
-    </div>
-  </div>
-</div>
 
-<!-- Modal Favoritos -->
-<div id="favoritesModal" class="modal-overlay hidden">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3 class="modal-title">Escolher Favoritos (máx. 3)</h3>
-      <button id="closeFavoritesModal" class="modal-close-button">
-        <i data-lucide="x" class="icon"></i>
-      </button>
-    </div>
-
-    <div class="search-container" style="margin-bottom: 1rem;">
-      <input type="search" id="favoritesSearchInput" placeholder="Buscar animes..." class="search-input">
-      <i data-lucide="search" class="icon"></i>
-      <div id="favoritesSearchResults" class="hidden"></div>
-    </div>
-
-    <div id="selectedFavorites" class="favorites-cards">
-      <!-- favoritos escolhidos aparecem aqui -->
-    </div>
-
-    <div class="modal-actions">
-      <button id="saveFavoritesBtn" class="button button-accent">Salvar</button>
-    </div>
-  </div>
-</div>
-
-    <!-- Main content -->
     <main class="main-content">
-      <!-- Banner -->
-<div class="profile-banner">
-      <img src="https://placehold.co/1200x200?text=Banner" alt="Banner do usuário" class="banner-image">
-      <div class="profile-details">
-        <img src="https://placehold.co/150x150?text=Avatar" alt="Avatar do usuário" class="profile-avatar">
-        <div class="profile-user-info">
-            <h2 id="profileUsername">Usuário</h2>
-            <p id="profileStats" style="color: var(--text-accent); font-weight: 500;">Carregando estatísticas...</p>
+      <div class="profile-banner">
+        <img src="https://placehold.co/1200x280?text=Banner" alt="Banner do usuário" class="banner-image">
+        <div class="profile-details">
+          <img src="https://placehold.co/150x150?text=Avatar" alt="Avatar do usuário" class="profile-avatar">
+          <div class="profile-user-info">
+              <h2 id="profileUsername">Usuário</h2>
+              <p id="profileStats" style="color: var(--text-accent); font-weight: 500;">...</p>
+          </div>
+          <button id="editProfileBtn" class="button button-accent">Editar Perfil</button>
         </div>
-        <button id="editProfileBtn" class="button button-accent" style="margin-left: auto;">Editar Perfil</button>
       </div>
-    </div>
-
-    <section class="carousel-section">
-      <div class="carousel-section-header">
-        <h2 class="carousel-section-title">Top 3 Favoritos</h2>
-        <button id="chooseFavoritesBtn" class="button button-accent" style="font-size: 0.8rem;">Alterar</button>
-      </div>
-      <div id="favoritesContainer" class="favorites-cards">
+      
+      <section class="carousel-section">
+        <div class="carousel-section-header">
+          <h2 class="carousel-section-title">Top 3 Favoritos</h2>
+          <button id="chooseFavoritesBtn" class="button button-accent" style="font-size: 0.8rem;">Alterar</button>
         </div>
-    </section>
+        <div id="favoritesContainer" class="favorites-cards">
+          </div>
+      </section>
 
-    <section class="carousel-section" style="margin-top: 2rem;">
+      <section class="carousel-section" style="margin-top: 2rem; padding-bottom: 2rem;">
         <div class="carousel-section-header">
             <h2 class="carousel-section-title">Minha Biblioteca</h2>
         </div>
@@ -133,92 +87,155 @@
         </div>
 
         <div id="libraryContainer" class="favorites-cards">
-            <p>Carregando biblioteca...</p>
+            <p>Carregando...</p>
         </div>
-    </section>
-     <div id="settingsModal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Configurações</h3>
-                <button id="closeSettingsModal" class="modal-close-button">
-                    <i data-lucide="x" class="icon"></i>
-                </button>
-            </div>
-            <div class="form-group">
-                <label for="themeSwitcher">Mudar Tema:</label>
-                <select id="themeSwitcher" class="form-select">
-                    <option value="dark">Escuro</option>
-                    <option value="light">Claro</option>
-                </select>
-            </div>
-             <div class="modal-actions">
-                <button id="saveSettings" class="button button-accent">
-                    Salvar
-                </button>
-            </div>
-        </div>
-    </div>
-    <div id="animeDetailsModal" class="modal-overlay hidden">
-  <div class="modal-content anime-details-modal">
-    <div class="modal-header">
-      <h2 id="animeDetailsModalTitle" class="modal-title">Título</h2>
-      <button id="closeAnimeDetailsModal" class="modal-close-button">
-        <i data-lucide="x" class="icon"></i>
-      </button>
-    </div>
-
-    <div class="anime-details-body">
-      <div class="anime-details-sidebar">
-          <img id="animeDetailsModalImage" class="anime-details-modal-image" alt="Poster">
-          
-          <div id="userAnimeActions" class="user-actions hidden">
-              <div class="form-group">
-                  <label></label>
-                  <select id="animeStatusSelect" class="form-select">
-                      <option value="plan_to_watch">Planejo Assistir</option>
-                      <option value="watching">Assistindo</option>
-                      <option value="completed">Completo</option>
-                      <option value="dropped">Desisti</option>
-                  </select>
-              </div>
-              <div class="form-group">
-                  <label></label>
-                  <div style="display:flex; align-items:center; gap:0.5rem; justify-content: space-between;">
-                      <input type="number" id="episodesInput" class="form-input" min="0" style="width: 70px;">
-                      <span style="font-size:0.8rem; color:var(--text-secondary);">de <span id="episodesTotalDisplay">?</span></span>
-                  </div>
-              </div>
-              <div class="form-group">
-                  <label></label>
-                  <div style="display: flex; align-items: center; gap: 0.5rem;">
-                      <i data-lucide="star" style="width: 1rem; color: #FFD700;"></i>
-                      <input type="number" id="animeScoreInput" class="form-input" min="0" max="10" step="0.5" placeholder="-" style="width: 100%;">
-                  </div>
-              </div>
-              <button id="saveToLibraryBtn" class="button button-accent" style="width:100%; margin-top:0.5rem;">Salvar</button>
-          </div>
-          <div id="loginWarning" class="hidden" style="text-align:center; padding:1rem; color:var(--text-accent); font-size:0.9rem;">
-              Faça login para salvar!
-          </div>
-      </div>
-
-      <div class="anime-details-content">
-          <div class="anime-meta-grid">
-              <div class="meta-item"><strong>Nota Global</strong><span id="animeDetailsModalScore">-</span></div>
-              <div class="meta-item"><strong>Ranking</strong><span id="animeDetailsModalRank"># -</span></div>
-              <div class="meta-item"><strong>Temporada</strong><span id="animeDetailsModalSeason">-</span></div>
-              <div class="meta-item"><strong>Membros</strong><span id="animeDetailsModalUsers">-</span></div>
-          </div>
-          <div id="animeDetailsModalGenres" class="tags"></div>
-          <h3 style="font-size:1.1rem; margin-bottom:0.5rem;">Sinopse</h3>
-          <div id="animeSynopsisArea" class="synopsis-area"></div>
-      </div>
-    </div>
-  </div>
-</div>
+      </section>
     </main>
   </div>
 
-<script type="module" src="js/profile.js"></script>    
+  <div id="editProfileModal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Editar Perfil</h3>
+        <button id="closeEditProfileModal" class="modal-close-button">
+          <i data-lucide="x" class="icon"></i>
+        </button>
+      </div>
+      <div class="form-group">
+        <label for="profileNameInput">Nome de usuário</label>
+        <input type="text" id="profileNameInput" class="form-input" placeholder="Seu nome">
+      </div>
+      <div class="form-group">
+        <label for="profileAvatarInput">Foto de Perfil</label>
+        <input type="file" id="profileAvatarInput" class="form-input" accept="image/*">
+      </div>
+      <div class="form-group">
+        <label for="profileBannerInput">Banner</label>
+        <input type="file" id="profileBannerInput" class="form-input" accept="image/*">
+      </div>
+      <div class="modal-actions">
+        <button id="saveProfileBtn" class="button button-accent">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="favoritesModal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Top 3 Favoritos</h3>
+        <button id="closeFavoritesModal" class="modal-close-button">
+          <i data-lucide="x" class="icon"></i>
+        </button>
+      </div>
+      <div class="search-container" style="margin-bottom: 1rem;">
+        <input type="search" id="favoritesSearchInput" placeholder="Buscar animes..." class="search-input">
+        <i data-lucide="search" class="icon"></i>
+        <div id="favoritesSearchResults" class="hidden"></div>
+      </div>
+      <div id="selectedFavorites" class="favorites-cards"></div>
+      <div class="modal-actions">
+        <button id="saveFavoritesBtn" class="button button-accent">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="settingsModal" class="modal-overlay hidden">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Configurações</h3>
+            <button id="closeSettingsModal" class="modal-close-button">
+                <i data-lucide="x" class="icon"></i>
+            </button>
+        </div>
+        <div class="form-group">
+            <label for="themeSwitcher">Mudar Tema:</label>
+            <select id="themeSwitcher" class="form-select">
+                <option value="dark">Dark</option>
+                <option value="light">Light</option>
+            </select>
+        </div>
+         <div class="modal-actions">
+            <button id="saveSettings" class="button button-accent">
+                Salvar
+            </button>
+        </div>
+    </div>
+  </div>
+
+  <div id="animeDetailsModal" class="modal-overlay hidden">
+    <div class="modal-content anime-details-modal">
+      <div class="modal-header">
+        <h2 id="animeDetailsModalTitle" class="modal-title">Título</h2>
+        <button id="closeAnimeDetailsModal" class="modal-close-button">
+          <i data-lucide="x" class="icon"></i>
+        </button>
+      </div>
+
+      <div class="anime-details-body">
+        <div class="anime-details-sidebar">
+            <img id="animeDetailsModalImage" class="anime-details-modal-image" alt="Poster">
+            
+            <div id="userAnimeActions" class="user-actions hidden">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Status</label>
+                    <div class="action-input-container">
+                        <select id="animeStatusSelect">
+                            <option value="plan_to_watch">Planejo Assistir</option>
+                            <option value="watching">Assistindo</option>
+                            <option value="completed">Completo</option>
+                            <option value="dropped">Desisti</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="actions-grid" style="display: flex; flex-direction: column; gap: 1rem;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>Progresso</label>
+                        <div class="action-input-container">
+                            <input type="number" id="episodesInput" min="0" placeholder="0" style="font-size: 1.1rem;">
+                            <span class="input-suffix">/ <span id="episodesTotalDisplay">?</span></span>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>Nota</label>
+                        <div class="action-input-container">
+                            <i data-lucide="star" class="score-icon" style="width: 1.2rem; height: 1.2rem;"></i>
+                            <input type="number" id="animeScoreInput" min="0" max="10" step="0.5" placeholder="-" style="text-align: center; font-size: 1.1rem; font-weight: bold;">
+                        </div>
+                    </div>
+                </div>
+
+                <button id="saveToLibraryBtn">Salvar Alterações</button>
+            </div>
+            
+            <div id="loginWarning" class="hidden" style="text-align:center; padding:1rem; color:var(--text-accent); font-size:0.9rem;">
+                Faça login para salvar!
+            </div>
+        </div>
+
+        <div class="anime-details-content">
+            <div class="anime-meta-grid">
+                <div class="meta-item"><strong>Nota Global</strong><span id="animeDetailsModalScore">-</span></div>
+                <div class="meta-item"><strong>Ranking</strong><span id="animeDetailsModalRank"># -</span></div>
+                <div class="meta-item"><strong>Temporada</strong><span id="animeDetailsModalSeason">-</span></div>
+                <div class="meta-item"><strong>Membros</strong><span id="animeDetailsModalUsers">-</span></div>
+            </div>
+
+            <div id="animeDetailsModalGenres" class="tags"></div>
+            
+            <div class="modal-tabs">
+                <button id="tabSynopsis" class="modal-tab active">Sinopse</button>
+                <button id="tabTrailer" class="modal-tab">Trailer</button>
+            </div>
+
+            <div id="animeSynopsisArea" class="synopsis-area content-tab active"></div>
+            <div id="animeTrailerArea" class="trailer-area content-tab hidden"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/profile.js"></script>
+    
 </body>
 </html>

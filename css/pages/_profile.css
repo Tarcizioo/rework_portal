@@ -8,7 +8,6 @@
     position: relative;
 }
 
-/* Banner com gradiente para facilitar leitura */
 .profile-banner {
     position: relative;
     margin-bottom: 5rem; 
@@ -16,11 +15,10 @@
 
 .banner-image {
     width: 100%;
-    height: 280px; /* Mais alto para dar destaque */
+    height: 280px; 
     object-fit: cover;
     border-radius: 1rem 1rem 0 0;
     background-color: var(--bg-tertiary);
-    /* Máscara suave na parte de baixo para integrar com o fundo */
     -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
     mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
 }
@@ -164,4 +162,180 @@
         width: 100%; /* Botão largura total no mobile */
         max-width: 250px;
     }
+    #selectedFavorites {
+        grid-template-columns: repeat(3, 1fr); /* Mantém 3 colunas mas menores */
+        gap: 0.5rem;
+    }
+    #selectedFavorites .anime-image-display {
+        height: 100px;
+    }
+}
+#favoritesModal .modal-content {
+    max-width: 1200px;
+    height: 1000px;
+    width: 95%;       
+}
+#favoritesModal .search-container {
+    position: relative;
+    margin-bottom: 2rem;
+    z-index: 20; 
+}
+
+#favoritesModal .search-input {
+    width: 100%;
+    padding: 1rem 1rem 1rem 3rem;
+    background-color: var(--bg-primary);
+    border: 2px solid transparent;
+    border-radius: 2rem;
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+#favoritesModal .search-input:focus {
+    border-color: var(--text-accent);
+    box-shadow: 0 0 0 4px rgba(150, 30, 242, 0.1);
+    background-color: var(--bg-secondary);
+}
+
+#favoritesModal .search-container .icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    width: 1.2rem;
+    height: 1.2rem;
+}
+
+#favoritesSearchResults {
+    position: absolute;
+    top: 110%; 
+    left: 0;
+    width: 100%;
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 50; /* Bem acima de tudo */
+    padding: 0.5rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--text-accent) var(--bg-primary);
+}
+
+#favoritesSearchResults::-webkit-scrollbar { width: 6px; }
+#favoritesSearchResults::-webkit-scrollbar-track { background: var(--bg-primary); border-radius: 3px; }
+#favoritesSearchResults::-webkit-scrollbar-thumb { background: var(--text-accent); border-radius: 3px; }
+
+/* Item Individual da Busca */
+.search-preview-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.search-preview-item:last-child { border-bottom: none; }
+
+.search-preview-item:hover {
+    background-color: var(--bg-secondary); /* Destaca ao passar o mouse */
+}
+
+.search-preview-image {
+    width: 45px;
+    height: 65px;
+    object-fit: cover;
+    border-radius: 0.35rem;
+    background-color: var(--bg-primary);
+    flex-shrink: 0;
+}
+
+.search-preview-info h4 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+/* --- GRID DE FAVORITOS SELECIONADOS --- */
+#selectedFavorites {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 colunas fixas */
+    gap: 1rem;
+    min-height: 800px; /* Garante altura mesmo vazio */
+    align-items: start;
+}
+
+/* Card do Favorito Selecionado */
+#selectedFavorites .anime-item-wrapper {
+    position: relative;
+    background-color: var(--bg-primary);
+    padding: 0; /* Remove padding interno do wrapper */
+    border-radius: 0.75rem;
+    overflow: hidden;
+    transition: transform 0.2s;
+    border: 1px solid var(--border-color);
+}
+
+#selectedFavorites .anime-item-wrapper:hover {
+    transform: translateY(-3px);
+    border-color: var(--text-accent);
+}
+
+#selectedFavorites .anime-image-display {
+    width: 100%;
+    height: 600px; /* Altura fixa para alinhar */
+    object-fit: cover;
+    border-radius: 0; /* Imagem preenche o card */
+    margin-bottom: 0;
+    mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+}
+
+#selectedFavorites h5 {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 0.5rem;
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    background: transparent;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Botão de Remover (X) */
+#selectedFavorites button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    transition: background 0.2s;
+    backdrop-filter: blur(4px);
+    z-index: 10;
+}
+
+#selectedFavorites button:hover {
+    background-color: #ef4444; /* Vermelho ao passar o mouse */
 }
