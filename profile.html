@@ -57,7 +57,9 @@
         <div class="profile-details">
           <img src="https://placehold.co/150x150?text=Avatar" alt="Avatar do usuário" class="profile-avatar">
           <div class="profile-user-info">
-              <h2 id="profileUsername">Usuário</h2>
+              <h2 id="profileUsername">Usuário
+                <span id="profileBadge" title="Emblema"></span>
+              </h2>
               <p id="profileStats" style="color: var(--text-accent); font-weight: 500;">...</p>
           </div>
           <button id="editProfileBtn" class="button button-accent">Editar Perfil</button>
@@ -93,31 +95,50 @@
     </main>
   </div>
 
-  <div id="editProfileModal" class="modal-overlay hidden">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title">Editar Perfil</h3>
-        <button id="closeEditProfileModal" class="modal-close-button">
-          <i data-lucide="x" class="icon"></i>
-        </button>
-      </div>
-      <div class="form-group">
-        <label for="profileNameInput">Nome de usuário</label>
-        <input type="text" id="profileNameInput" class="form-input" placeholder="Seu nome">
-      </div>
-      <div class="form-group">
-        <label for="profileAvatarInput">Foto de Perfil</label>
-        <input type="file" id="profileAvatarInput" class="form-input" accept="image/*">
-      </div>
-      <div class="form-group">
-        <label for="profileBannerInput">Banner</label>
-        <input type="file" id="profileBannerInput" class="form-input" accept="image/*">
-      </div>
-      <div class="modal-actions">
-        <button id="saveProfileBtn" class="button button-accent">Salvar</button>
-      </div>
+<div id="editProfileModal" class="modal-overlay hidden">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title">Editar Perfil</h3>
+      <button id="closeEditProfileModal" class="modal-close-button">
+        <i data-lucide="x" class="icon"></i>
+      </button>
+    </div>
+
+    <div class="modal-tabs" style="padding: 0 1.5rem; margin-top: 1rem;">
+        <button id="tabEditInfo" class="modal-tab active">Dados</button>
+        <button id="tabEditBadges" class="modal-tab">Emblemas</button>
+    </div>
+
+    <div id="editInfoContent" class="content-tab active" style="padding: 0 1.5rem;">
+        <div class="form-group">
+          <label for="profileNameInput">Nome de usuário</label>
+          <div class="action-input-container">
+             <input type="text" id="profileNameInput" placeholder="Seu nome">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Avatar</label>
+          <input type="file" id="profileAvatarInput" class="form-input" accept="image/*">
+        </div>
+        <div class="form-group">
+          <label>Banner</label>
+          <input type="file" id="profileBannerInput" class="form-input" accept="image/*">
+        </div>
+    </div>
+
+    <div id="editBadgesContent" class="content-tab hidden" style="padding: 0 1.5rem;">
+        <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem;">
+            Desbloqueie emblemas usando a plataforma e selecione um para exibir.
+        </p>
+        <div id="badgesGrid" class="badges-grid">
+            </div>
+    </div>
+
+    <div class="modal-actions">
+      <button id="saveProfileBtn" class="button button-accent">Salvar</button>
     </div>
   </div>
+</div>
 
   <div id="favoritesModal" class="modal-overlay hidden">
     <div class="modal-content">

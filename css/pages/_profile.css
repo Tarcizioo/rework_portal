@@ -339,3 +339,112 @@
 #selectedFavorites button:hover {
     background-color: #ef4444; /* Vermelho ao passar o mouse */
 }
+#profileBadge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+}
+
+.modal-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Grid de Seleção de Emblemas */
+.badges-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.badge-item {
+    background-color: var(--bg-primary);
+    border: 2px solid var(--border-color);
+    border-radius: 0.75rem;
+    padding: 1rem 0.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    opacity: 0.5; /* Bloqueado por padrão */
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.badge-item:hover {
+    background-color: var(--bg-tertiary);
+}
+
+/* Emblema Desbloqueado */
+.badge-item.unlocked {
+    opacity: 1;
+    border-color: var(--text-secondary);
+}
+
+/* Emblema Selecionado */
+.badge-item.selected {
+    border-color: var(--text-accent);
+    background-color: rgba(150, 30, 242, 0.1);
+    box-shadow: 0 0 0 2px rgba(150, 30, 242, 0.3);
+}
+
+.badge-icon {
+    width: 2rem;
+    height: 2rem;
+    margin-bottom: 0.25rem;
+}
+
+.badge-name {
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-desc {
+    font-size: 0.65rem;
+    color: var(--text-secondary);
+    display: none; /* Esconde descrição na grid pra ficar limpo */
+}
+#profileBadge img {
+    width: 4rem;        /* Tamanho do ícone ao lado do nome */
+    height: 4rem;
+    border-radius: 1rem;
+    object-fit: contain; 
+    vertical-align: middle;
+}
+
+/* 2. O Emblema Grande (No Modal de Seleção) */
+.badge-icon-img {
+    width: 4.5rem;      /* Tamanho maior na grid de seleção */
+    height: 4.5rem;
+    object-fit: contain;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+/* Efeito Visual: Bloqueado vs Desbloqueado */
+
+/* Se bloqueado: Imagem fica preto e branco e transparente */
+.badge-item:not(.unlocked) .badge-icon-img {
+    filter: grayscale(100%);
+    opacity: 0.4;
+}
+
+/* Se desbloqueado: Imagem colorida */
+.badge-item.unlocked .badge-icon-img {
+    filter: none;
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Se selecionado: Um leve aumento */
+.badge-item.selected .badge-icon-img {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 8px rgba(150, 30, 242, 0.6));
+}
