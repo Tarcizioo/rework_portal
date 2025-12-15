@@ -14,7 +14,6 @@
     opacity: 0.9;
 }
 
-/* Botão de menu mobile */
 .mobile-menu-button {
     position: fixed;
     bottom: 1rem;
@@ -30,6 +29,18 @@
     display: none; /* Escondido por padrão no desktop */
     align-items: center;
     justify-content: center;
+}
+.button-danger {
+    background-color: transparent;
+    color: #ef4444; /* Vermelho */
+    border: 1px solid #ef4444;
+    margin-top: 0.5rem;
+    width: 100%;
+    font-size: 0.9rem;
+}
+
+.button-danger:hover {
+    background-color: rgba(239, 68, 68, 0.1);
 }
 
 @media (max-width: 767px) {

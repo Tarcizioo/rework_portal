@@ -246,10 +246,11 @@ body {
 .slick-slide { padding: 0 10px; }
 .slick-list { margin: 0 -10px; }
 
-/* Media Queries para a página principal */
 @media (max-width: 767px) {
     .main-content {
         padding: 0;
+        padding-bottom: 5rem !important;
+        overflow-x: hidden;
     }
     .main-header, .carousel-section {
         padding-left: 1rem;

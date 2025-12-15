@@ -1,12 +1,15 @@
 import { auth, db } from "./firebase-config.js";
-import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+// ADICIONADO: deleteDoc na importação
+import { doc, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 let currentModalAnime = null;
 
-// Função robusta para extrair minutos da string da API (ex: "24 min per ep", "1 hr 30 min")
+const toggleBodyScroll = (lock) => {
+    document.body.style.overflow = lock ? 'hidden' : '';
+};
+
 function parseDuration(durationString) {
-    if (!durationString || typeof durationString !== 'string') return 24; // Default fallback
-    
+    if (!durationString || typeof durationString !== 'string') return 24;
     const numbers = durationString.match(/\d+/g);
     if (!numbers) return 24;
 
@@ -29,11 +32,9 @@ function populateModalUI(anime) {
     document.getElementById('animeDetailsModalSeason').textContent = anime.season || '-';
     document.getElementById('animeDetailsModalUsers').textContent = anime.users || '-';
 
-    // Tags/Generos
     const genresContainer = document.getElementById('animeDetailsModalGenres');
     genresContainer.innerHTML = ''; 
     if (anime.genres) {
-        // Se já vier formatado ou se for array
         const genresList = typeof anime.genres === 'string' ? anime.genres.split(', ') : anime.genres;
         genresList.forEach(genre => {
             const span = document.createElement('span');
@@ -43,13 +44,11 @@ function populateModalUI(anime) {
         });
     }
 
-    // Sinopse e Trailer
     const tabSynopsis = document.getElementById('tabSynopsis');
     const tabTrailer = document.getElementById('tabTrailer');
     const contentSynopsis = document.getElementById('animeSynopsisArea');
     const contentTrailer = document.getElementById('animeTrailerArea');
 
-    // Reset abas
     tabSynopsis.classList.add('active');
     tabTrailer.classList.remove('active');
     contentSynopsis.classList.remove('hidden'); contentSynopsis.classList.add('active');
@@ -59,7 +58,6 @@ function populateModalUI(anime) {
     const synopsisText = anime.fullSynopsis || anime.synopsis || anime.miniSynopsis || "Sinopse indisponível.";
     contentSynopsis.innerHTML = `<p>${synopsisText}</p>`;
 
-    // Lógica das abas
     if (anime.trailerUrl) {
         tabTrailer.style.display = 'inline-block';
         tabTrailer.onclick = () => {
@@ -70,7 +68,7 @@ function populateModalUI(anime) {
         tabSynopsis.onclick = () => {
             tabTrailer.classList.remove('active'); tabSynopsis.classList.add('active');
             contentTrailer.classList.add('hidden'); contentSynopsis.classList.remove('hidden');
-            contentTrailer.innerHTML = ""; // Limpa iframe para parar som
+            contentTrailer.innerHTML = "";
         };
     } else {
         tabTrailer.style.display = 'none';
@@ -81,19 +79,17 @@ export async function openAnimeDetailsModal(anime) {
     const modal = document.getElementById('animeDetailsModal');
     if (!modal) return;
     
+    toggleBodyScroll(true);
     currentModalAnime = anime;
     populateModalUI(anime);
     modal.classList.remove('hidden');
 
-    // Fetch de dados detalhados se necessário (API Jikan)
     if (!anime.fullSynopsis || !anime.durationParsed) {
         try {
             const res = await fetch(`https://api.jikan.moe/v4/anime/${anime.id}`);
             if(res.ok){
                 const json = await res.json();
                 const freshData = json.data;
-
-                // Atualiza objeto local com dados frescos da API
                 currentModalAnime = {
                     ...currentModalAnime,
                     fullSynopsis: freshData.synopsis,
@@ -102,19 +98,13 @@ export async function openAnimeDetailsModal(anime) {
                     score: freshData.score,
                     episodes: freshData.episodes,
                     duration: freshData.duration,
-                    durationParsed: parseDuration(freshData.duration) // Importante para o cálculo de horas
+                    durationParsed: parseDuration(freshData.duration)
                 };
-                
-                // Reaplica na UI
                 populateModalUI(currentModalAnime);
-                
-                // Atualiza display de total de episódios
                 const totalDisplay = document.getElementById('episodesTotalDisplay');
                 if(totalDisplay) totalDisplay.textContent = currentModalAnime.episodes || "?";
             }
-        } catch (e) {
-            console.warn("Não foi possível buscar detalhes extras:", e);
-        }
+        } catch (e) { console.warn("Erro update details:", e); }
     }
     
     await setupUserInputs(currentModalAnime);
@@ -128,43 +118,38 @@ async function setupUserInputs(anime) {
     const totalDisplay = document.getElementById('episodesTotalDisplay');
     const scoreInput = document.getElementById('animeScoreInput');
     
+    let deleteBtn = document.getElementById('deleteFromLibraryBtn');
+    
     const user = auth.currentUser;
 
     if (!user) {
         actionsDiv.classList.add('hidden');
         loginWarning.classList.remove('hidden');
+        if(deleteBtn) deleteBtn.classList.add('hidden'); // Esconde delete se não logado
         return;
     }
 
     actionsDiv.classList.remove('hidden');
     loginWarning.classList.add('hidden');
 
-    // Configuração Inicial dos Inputs
     const totalEpisodes = anime.episodes || 0;
     totalDisplay.textContent = totalEpisodes || "?";
     episodesInput.max = totalEpisodes || 9999;
 
-    // Reseta valores visuais antes de carregar do banco
     statusSelect.value = "plan_to_watch";
     episodesInput.value = 0;
     if(scoreInput) scoreInput.value = "";
+    
+    if(deleteBtn) deleteBtn.classList.add('hidden');
 
-    // Automação: Se mudar status para completed, preenche tudo
     statusSelect.onchange = () => {
-        if (statusSelect.value === 'completed' && totalEpisodes > 0) {
-            episodesInput.value = totalEpisodes;
-        }
+        if (statusSelect.value === 'completed' && totalEpisodes > 0) episodesInput.value = totalEpisodes;
     };
-
-    // Automação: Se preencher todos eps, muda status para completed
     episodesInput.oninput = () => {
         const val = parseInt(episodesInput.value) || 0;
-        if (totalEpisodes > 0 && val >= totalEpisodes) {
-            statusSelect.value = 'completed';
-        }
+        if (totalEpisodes > 0 && val >= totalEpisodes) statusSelect.value = 'completed';
     };
 
-    // Carrega dados do Firestore (se existirem)
     try {
         const docRef = doc(db, "users", user.uid, "library", anime.id.toString());
         const docSnap = await getDoc(docRef);
@@ -174,23 +159,73 @@ async function setupUserInputs(anime) {
             statusSelect.value = data.status || "plan_to_watch";
             episodesInput.value = data.watched_episodes || 0;
             if(scoreInput) scoreInput.value = data.personal_score || "";
+            
+            // --- MOSTRAR BOTÃO DE DELETAR ---
+            if(deleteBtn) deleteBtn.classList.remove('hidden');
         }
-    } catch (e) {
-        console.error("Erro ao carregar dados do usuário:", e);
-    }
+    } catch (e) { console.error(e); }
 }
 
 export function initModalListeners() {
     const modal = document.getElementById('animeDetailsModal');
     const closeBtn = document.getElementById('closeAnimeDetailsModal');
     const saveBtn = document.getElementById('saveToLibraryBtn');
+    const actionsContainer = document.getElementById('userAnimeActions');
 
-    if (closeBtn) closeBtn.addEventListener('click', () => {
-        modal.classList.add('hidden');
-        document.getElementById('animeTrailerArea').innerHTML = ""; // Para video
-    });
+    // --- CRIAÇÃO DINÂMICA DO BOTÃO DE REMOVER ---
+    // Verifica se já existe, se não, cria e adiciona
+    if (actionsContainer && !document.getElementById('deleteFromLibraryBtn')) {
+        const deleteBtn = document.createElement('button');
+        deleteBtn.id = 'deleteFromLibraryBtn';
+        deleteBtn.className = 'button button-danger hidden'; // Começa escondido
+        deleteBtn.textContent = 'Remover da Biblioteca';
+        actionsContainer.appendChild(deleteBtn);
 
-if (saveBtn) {
+        // Lógica de Exclusão
+        deleteBtn.addEventListener('click', async () => {
+            if (!auth.currentUser || !currentModalAnime) return;
+            
+            if (confirm(`Tem certeza que deseja remover "${currentModalAnime.title}" da sua biblioteca?`)) {
+                deleteBtn.textContent = "Removendo...";
+                deleteBtn.disabled = true;
+
+                try {
+                    await deleteDoc(doc(db, "users", auth.currentUser.uid, "library", currentModalAnime.id.toString()));
+                    
+                    // Feedback Visual
+                    const toast = document.createElement('div');
+                    toast.className = 'toast-notification show';
+                    toast.innerHTML = `<i data-lucide="trash-2" style="color: #ef4444"></i> Removido!`;
+                    document.body.appendChild(toast);
+                    if(typeof lucide !== 'undefined') lucide.createIcons();
+                    setTimeout(() => toast.remove(), 3000);
+
+                    window.dispatchEvent(new Event('libraryUpdated')); // Atualiza o perfil
+                    modal.classList.add('hidden'); // Fecha modal
+                    toggleBodyScroll(false);
+
+                } catch (e) {
+                    console.error(e);
+                    alert("Erro ao remover.");
+                } finally {
+                    deleteBtn.textContent = 'Remover da Biblioteca';
+                    deleteBtn.disabled = false;
+                }
+            }
+        });
+    }
+
+    if (closeBtn) {
+        const newCloseBtn = closeBtn.cloneNode(true);
+        closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+        newCloseBtn.addEventListener('click', () => {
+            modal.classList.add('hidden');
+            toggleBodyScroll(false);
+            document.getElementById('animeTrailerArea').innerHTML = ""; 
+        });
+    }
+
+    if (saveBtn) {
         const newBtn = saveBtn.cloneNode(true);
         saveBtn.parentNode.replaceChild(newBtn, saveBtn);
         
@@ -200,20 +235,11 @@ if (saveBtn) {
             const status = document.getElementById('animeStatusSelect').value;
             const watched = parseInt(document.getElementById('episodesInput').value) || 0;
             
-            // --- CORREÇÃO AQUI: Validação da Nota ---
             let scoreVal = parseFloat(document.getElementById('animeScoreInput').value);
+            if (!isNaN(scoreVal)) scoreVal = Math.min(Math.max(scoreVal, 0), 10);
+            else scoreVal = null;
             
-            // Se o usuário digitou, aplicamos os limites
-            if (!isNaN(scoreVal)) {
-                if (scoreVal < 0) scoreVal = 0;
-                if (scoreVal > 10) scoreVal = 10;
-            } else {
-                scoreVal = null; // Se estiver vazio, salva como null
-            }
-            // ----------------------------------------
-            
-            newBtn.textContent = "Salvando..."; 
-            newBtn.disabled = true;
+            newBtn.textContent = "Salvando..."; newBtn.disabled = true;
 
             try {
                 let durationVal = currentModalAnime.durationParsed;
@@ -225,21 +251,27 @@ if (saveBtn) {
                     imageUrl: currentModalAnime.imageUrl,
                     total_episodes: currentModalAnime.episodes || 0,
                     duration_minutes: durationVal,
-                    
                     status: status,
                     watched_episodes: watched,
-                    personal_score: scoreVal, // Usa a nota validada
+                    personal_score: scoreVal,
                     last_updated: new Date()
                 };
 
                 await setDoc(doc(db, "users", auth.currentUser.uid, "library", currentModalAnime.id.toString()), libraryItem);
                 
-                newBtn.textContent = "Salvo com Sucesso!";
+                const toast = document.createElement('div');
+                toast.className = 'toast-notification show';
+                toast.innerHTML = `<i data-lucide="check-circle" style="color: var(--text-accent)"></i> Salvo!`;
+                document.body.appendChild(toast);
+                if(typeof lucide !== 'undefined') lucide.createIcons();
+                setTimeout(() => toast.remove(), 3000);
+
                 window.dispatchEvent(new Event('libraryUpdated')); 
-            } catch (e) { 
-                console.error(e); 
-                newBtn.textContent = "Erro ao Salvar"; 
-            }
+                
+                const deleteBtn = document.getElementById('deleteFromLibraryBtn');
+                if(deleteBtn) deleteBtn.classList.remove('hidden');
+
+            } catch (e) { console.error(e); }
 
             setTimeout(() => { newBtn.textContent = "Salvar Alterações"; newBtn.disabled = false; }, 2000);
         });
