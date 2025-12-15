@@ -2,10 +2,13 @@ import { auth, db } from "./firebase-config.js";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile, sendPasswordResetEmail, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { openAnimeDetailsModal, initModalListeners } from "./anime-modal.js";
 
-// DOM Elements
 const heroCarouselEl = document.getElementById('heroCarousel');
 const popularAnimesCarouselEl = document.getElementById('popularAnimesCarousel');
 const mostRecentAnimesCarouselEl = document.getElementById('mostRecentAnimesCarousel');
+const actionAnimesCarouselEl = document.getElementById('actionAnimesCarousel');
+const romanceAnimesCarouselEl = document.getElementById('romanceAnimesCarousel');
+const dramaAnimesCarouselEl = document.getElementById('dramaAnimesCarousel');
+
 const settingsModal = document.getElementById('settingsModal');
 const settingsLink = document.getElementById('settingsLink');
 const settingsLinkMobile = document.getElementById('settingsLinkMobile');
@@ -15,16 +18,38 @@ const saveSettingsBtn = document.getElementById('saveSettings');
 const searchInput = document.getElementById('searchInput');
 const searchResultsPreview = document.getElementById('searchResultsPreview');
 
-// Utils
 function getDefaultImageOnError(e) { e.target.src = `https://placehold.co/180x270?text=Erro`; }
 function getSearchPreviewImageOnError(e) { e.target.src = `https://placehold.co/40x60?text=X`; }
 function debounce(func, delay = 500) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), delay); }; }
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
 function parseDuration(durationString) {
-    const numbers = durationString.match(/\d+/g); if (!numbers) return 24;
+    const numbers = durationString?.match(/\d+/g);
+    if (!numbers) return 24;
     let minutes = 0;
-    if (durationString.includes("hr")) { minutes += parseInt(numbers[0]) * 60; if (numbers[1]) minutes += parseInt(numbers[1]); } 
-    else { minutes = parseInt(numbers[0]); }
+    if (durationString.includes("hr")) { 
+        minutes += parseInt(numbers[0]) * 60; 
+        if (numbers[1]) minutes += parseInt(numbers[1]); 
+    } else { 
+        minutes = parseInt(numbers[0]); 
+    }
     return minutes || 24;
+}
+
+function showLoadingSkeleton(element) {
+    if (!element) return;
+    if ($(element).hasClass('slick-initialized')) $(element).slick('unslick');
+    
+    element.innerHTML = `
+        <div class="skeleton-wrapper">
+            ${Array(5).fill(0).map(() => `
+                <div class="skeleton-card">
+                    <div class="skeleton-image"></div>
+                    <div class="skeleton-text"></div>
+                </div>
+            `).join('')}
+        </div>
+    `;
 }
 
 const transformApiData = (apiAnime) => ({
@@ -37,27 +62,38 @@ const transformApiData = (apiAnime) => ({
     score: apiAnime.score || "N/A", rank: apiAnime.rank || "N/A",
     season: apiAnime.season ? `${apiAnime.season.charAt(0).toUpperCase() + apiAnime.season.slice(1)} ${apiAnime.year}` : "Desconhecido",
     episodes: apiAnime.episodes || 0,
-    duration: apiAnime.duration || "24 min", durationParsed: parseDuration(apiAnime.duration || "24 min"),
+    duration: apiAnime.duration,
+    durationParsed: parseDuration(apiAnime.duration),
     trailerUrl: apiAnime.trailer?.embed_url || null
 });
 
-// Carousel Logic
 function createAnimeCard(anime) {
     const slideItem = document.createElement('div');
-    slideItem.innerHTML = `<div class="anime-item-wrapper"><img src="${anime.imageUrl}" class="anime-image-display" onerror="getDefaultImageOnError(event)"><h3 class="anime-title-display">${anime.title}</h3></div>`;
+    slideItem.innerHTML = `<div class="anime-item-wrapper"><img src="${anime.imageUrl}" class="anime-image-display" loading="lazy" onerror="getDefaultImageOnError(event)"><h3 class="anime-title-display">${anime.title}</h3></div>`;
     slideItem.querySelector('.anime-item-wrapper').addEventListener('click', () => openAnimeDetailsModal(anime));
     return slideItem;
 }
+
 function populateCarousel(element, animes) {
     if (!element) return;
-    if ($(element).hasClass('slick-initialized')) $(element).slick('unslick');
-    element.innerHTML = ''; animes.forEach(anime => element.appendChild(createAnimeCard(anime)));
-}
-function initializeSlickCarousel(selector) {
-    $(selector).slick({ dots: true, infinite: true, speed: 300, slidesToShow: 5, slidesToScroll: 5, responsive: [{ breakpoint: 1380, settings: { slidesToShow: 4, slidesToScroll: 4 } }, { breakpoint: 1024, settings: { slidesToShow: 3, slidesToScroll: 3 } }, { breakpoint: 768, settings: { slidesToShow: 2, slidesToScroll: 2, dots: false } }, { breakpoint: 480, settings: { slidesToShow: 2, slidesToScroll: 2, dots: false } }] });
+    element.innerHTML = ''; 
+    animes.forEach(anime => element.appendChild(createAnimeCard(anime)));
 }
 
-// Hero Logic
+function initializeSlickCarousel(selector) {
+    if (!document.querySelector(selector) || document.querySelector(selector).children.length === 0) return;
+    
+    $(selector).slick({ 
+        dots: true, infinite: true, speed: 300, slidesToShow: 5, slidesToScroll: 5, 
+        responsive: [
+            { breakpoint: 1380, settings: { slidesToShow: 4, slidesToScroll: 4 } }, 
+            { breakpoint: 1024, settings: { slidesToShow: 3, slidesToScroll: 3 } }, 
+            { breakpoint: 768, settings: { slidesToShow: 2, slidesToScroll: 2, dots: false } }, 
+            { breakpoint: 480, settings: { slidesToShow: 2, slidesToScroll: 2, dots: false } }
+        ] 
+    });
+}
+
 function createHeroSlide(anime) {
     const slide = document.createElement('div');
     slide.className = 'hero-slide';
@@ -68,32 +104,76 @@ function createHeroSlide(anime) {
 function populateHeroCarousel(animes) { if (!heroCarouselEl) return; heroCarouselEl.innerHTML = ''; animes.forEach(anime => heroCarouselEl.appendChild(createHeroSlide(anime))); }
 function initializeHeroCarousel() { if (!heroCarouselEl || $(heroCarouselEl).hasClass('slick-initialized')) return; $(heroCarouselEl).slick({ dots: true, arrows: true, infinite: true, speed: 500, fade: true, cssEase: 'linear', autoplay: true, autoplaySpeed: 5000 }); }
 
-// Fetch & Loading
-async function fetchAndDisplayData() {
-    showLoadingState(true);
+async function fetchByGenre(genreId, containerId, orderBy = 'score', excludeIds = '') {
+    const container = document.getElementById(containerId);
+    if(!container) return;
+
+    let url = `https://api.jikan.moe/v4/anime?genres=${genreId}&limit=15&order_by=${orderBy}&sort=desc&type=tv`;
+    if (excludeIds) {
+        url += `&genres_exclude=${excludeIds}`;
+    }
+
     try {
-        const [popularResponse, recentResponse] = await Promise.all([fetch("https://api.jikan.moe/v4/top/anime?limit=15"), fetch("https://api.jikan.moe/v4/seasons/now?limit=15")]);
-        const popularData = await popularResponse.json(); const recentData = await recentResponse.json();
-        const popularAnimes = popularData.data.map(transformApiData); const recentAnimes = recentData.data.map(transformApiData);
-        populateHeroCarousel(popularAnimes.slice(0, 5)); initializeHeroCarousel();
-        populateCarousel(popularAnimesCarouselEl, popularAnimes); initializeSlickCarousel('#popularAnimesCarousel');
-        populateCarousel(mostRecentAnimesCarouselEl, recentAnimes); initializeSlickCarousel('#mostRecentAnimesCarousel');
-    } catch (error) { console.error("Erro dados:", error); } finally { showLoadingState(false); }
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`Status ${res.status}`);
+        
+        const json = await res.json();
+        const animes = json.data.map(transformApiData);
+        populateCarousel(container, animes);
+        initializeSlickCarousel(`#${containerId}`);
+    } catch (error) {
+        console.error(`Erro ao carregar genero ${genreId}:`, error);
+        container.innerHTML = '<p style="text-align:center; padding:1rem; opacity:0.7;">Não foi possível carregar no momento.</p>';
+    }
 }
 
-function showLoadingState(isLoading) {
-    const carousels = [popularAnimesCarouselEl, mostRecentAnimesCarouselEl];
-    const skeletonHTML = `<div class="skeleton-wrapper">${Array(5).fill('').map(() => `<div class="skeleton-card"><div class="skeleton-image"></div><div class="skeleton-text"></div></div>`).join('')}</div>`;
-    carousels.forEach(c => { if(c) { if(isLoading) { if($(c).hasClass('slick-initialized')) $(c).slick('unslick'); c.innerHTML = skeletonHTML; } else { const sk = c.querySelector('.skeleton-wrapper'); if(sk) sk.remove(); } } });
-    if (heroCarouselEl && isLoading) { if($(heroCarouselEl).hasClass('slick-initialized')) $(heroCarouselEl).slick('unslick'); heroCarouselEl.innerHTML = `<div style="height:350px;width:100%;background:var(--bg-tertiary);position:relative;border-radius:20px;"><div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.05),transparent);animation:shimmer 1.5s infinite;"></div></div>`; }
+async function fetchAndDisplayData() {
+    showLoadingSkeleton(popularAnimesCarouselEl);
+    showLoadingSkeleton(mostRecentAnimesCarouselEl);
+    showLoadingSkeleton(actionAnimesCarouselEl);
+    showLoadingSkeleton(romanceAnimesCarouselEl);
+    showLoadingSkeleton(dramaAnimesCarouselEl);
+
+    try {
+        const [popularResponse, recentResponse] = await Promise.all([
+            fetch("https://api.jikan.moe/v4/top/anime?limit=15"), 
+            fetch("https://api.jikan.moe/v4/seasons/now?limit=15")
+        ]);
+        
+        const popularData = await popularResponse.json(); 
+        const recentData = await recentResponse.json();
+        
+        const popularAnimes = popularData.data.map(transformApiData); 
+        const recentAnimes = recentData.data.map(transformApiData);
+        
+        populateHeroCarousel(popularAnimes.slice(0, 5)); 
+        initializeHeroCarousel();
+        
+        populateCarousel(popularAnimesCarouselEl, popularAnimes); 
+        initializeSlickCarousel('#popularAnimesCarousel');
+        
+        populateCarousel(mostRecentAnimesCarouselEl, recentAnimes); 
+        initializeSlickCarousel('#mostRecentAnimesCarousel');
+
+        await delay(800); 
+        await fetchByGenre(1, 'actionAnimesCarousel', 'members', '15');
+
+        await delay(1200); 
+        await fetchByGenre(22, 'romanceAnimesCarousel', 'favorites', '1'); 
+
+        await delay(1200); 
+        await fetchByGenre(8, 'dramaAnimesCarousel', 'score', '1,2'); 
+
+    } catch (error) { 
+        console.error("Erro geral de carregamento:", error); 
+    } 
 }
 
-// Search
 const handleSearch = async (searchTerm) => {
     if (searchTerm.length < 3) { searchResultsPreview.classList.add('hidden'); return; }
     searchResultsPreview.innerHTML = `<p style="padding:0.75rem;text-align:center;">A pesquisar...</p>`; searchResultsPreview.classList.remove('hidden');
     try {
-        const response = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(searchTerm)}&limit=5`);
+        const response = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(searchTerm)}&limit=5&order_by=members&sort=desc&sfw=true`);
         const searchData = await response.json(); searchResultsPreview.innerHTML = ''; 
         if (searchData.data && searchData.data.length > 0) {
             searchData.data.forEach(animeData => {
@@ -107,7 +187,6 @@ const handleSearch = async (searchTerm) => {
     } catch (e) { searchResultsPreview.innerHTML = `<p>Erro.</p>`; }
 };
 
-// INIT
 document.addEventListener('DOMContentLoaded', () => {
     if (typeof lucide !== 'undefined') lucide.createIcons();
     const currentTheme = localStorage.getItem('animeSiteTheme') || 'dark';
@@ -123,7 +202,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('click', (e) => { if (searchInput.parentElement && !searchInput.parentElement.contains(e.target)) searchResultsPreview.classList.add('hidden'); });
     }
     
-    // Auth & Mobile Sidebar
     const authModal = document.getElementById('authModal');
     const closeAuthModalBtn = document.getElementById('closeAuthModalBtn');
     const loginForm = document.getElementById('loginForm'); const registerForm = document.getElementById('registerForm'); const resetPasswordForm = document.getElementById('resetPasswordForm');
@@ -138,7 +216,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (closeMobileSidebarBtn) closeMobileSidebarBtn.addEventListener('click', closeMobileNav);
     if (mobileSidebarOverlay) mobileSidebarOverlay.addEventListener('click', (e) => { if (e.target === mobileSidebarOverlay) closeMobileNav(); });
 
-    // Settings
     function openSettings(e) { if(e) e.preventDefault(); if(settingsModal) settingsModal.classList.remove('hidden'); closeMobileNav(); }
     function closeSettings() { if(settingsModal) settingsModal.classList.add('hidden'); }
     if(settingsLink) settingsLink.addEventListener('click', openSettings);
@@ -149,11 +226,9 @@ document.addEventListener('DOMContentLoaded', () => {
         closeSettings();
     });
 
-    // Sidebar Desktop
     const sidebar = document.getElementById('sidebar'); const toggleBtn = document.getElementById('toggleSidebarBtn');
     if(toggleBtn) toggleBtn.addEventListener('click', () => sidebar.classList.toggle('collapsed'));
 
-    // Auth Logic
     if(closeAuthModalBtn) closeAuthModalBtn.addEventListener('click', () => authModal.classList.add('hidden'));
     function showLoginForm() { loginTabBtn.classList.add('active'); registerTabBtn.classList.remove('active'); loginForm.classList.add('active'); registerForm.classList.remove('active'); resetPasswordForm.classList.remove('active'); authTabsContainer.classList.remove('hidden'); authModalTitle.textContent = "Aceder à Conta"; }
     if(loginTabBtn && registerTabBtn) {
