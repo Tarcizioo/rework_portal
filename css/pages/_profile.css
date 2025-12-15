@@ -66,7 +66,6 @@
     gap: 1rem;
 }
 
-/* Seção de Favoritos (na página de perfil) */
 .favorites-cards {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -103,77 +102,12 @@
     width: 100%;
 }
 
-@media (max-width: 768px) {
-    .profile-banner {
-        margin-bottom: 0; /* Remove margem inferior excessiva */
-        display: flex;
-        flex-direction: column;
-    }
-
-    .banner-image {
-        height: 180px;
-        -webkit-mask-image: none; /* Remove gradiente para ver a imagem toda */
-        mask-image: none;
-        border-radius: 0; /* Remove bordas arredondadas no topo mobile */
-    }
-
-    /* Detalhes do Perfil (Avatar + Texto) */
-    .profile-details {
-        position: static; /* Remove posição absoluta: Texto vai para baixo do banner */
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        margin-top: -50px; /* Puxa o Avatar para cima do Banner */
-        padding: 0 1rem 2rem 1rem;
-        background-color: transparent;
-        left: 0;
-        right: 0;
-        bottom: auto;
-    }
-
-    .profile-avatar {
-        width: 100px;
-        height: 100px;
-        border: 4px solid var(--bg-secondary); /* Borda na cor do fundo da página */
-        margin-bottom: 0.75rem;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-    }
-
-    .profile-user-info {
-        width: 100%;
-        margin-bottom: 1rem;
-        text-shadow: none; /* Remove sombra pois agora está no fundo sólido */
-    }
-
-    #profileUsername {
-        color: var(--text-primary); /* Texto na cor normal do tema (não branco forçado) */
-        font-size: 1.5rem;
-        margin-bottom: 0.25rem;
-    }
-
-    #profileStats {
-        justify-content: center;
-        color: var(--text-secondary);
-        font-size: 0.9rem;
-    }
-
-    /* Botão Editar */
-    #editProfileBtn {
-        width: 100%; /* Botão largura total no mobile */
-        max-width: 250px;
-    }
-    #selectedFavorites {
-        grid-template-columns: repeat(3, 1fr); /* Mantém 3 colunas mas menores */
-        gap: 0.5rem;
-    }
-    #selectedFavorites .anime-image-display {
-        height: 100px;
-    }
-}
 #favoritesModal .modal-content {
     max-width: 1200px;
-    height: 1000px;
-    width: 95%;       
+    height: 85vh; 
+    width: 95%;
+    display: flex;
+    flex-direction: column;
 }
 #favoritesModal .search-container {
     position: relative;
@@ -185,8 +119,6 @@
     width: 100%;
     padding: 1rem 1rem 1rem 3rem;
     background-color: var(--bg-primary);
-    border: 2px solid transparent;
-    border-radius: 2rem;
     color: var(--text-primary);
     font-size: 1rem;
     transition: all 0.2s ease;
@@ -229,7 +161,6 @@
 #favoritesSearchResults::-webkit-scrollbar-track { background: var(--bg-primary); border-radius: 3px; }
 #favoritesSearchResults::-webkit-scrollbar-thumb { background: var(--text-accent); border-radius: 3px; }
 
-/* Item Individual da Busca */
 .search-preview-item {
     display: flex;
     align-items: center;
@@ -266,17 +197,18 @@
 /* --- GRID DE FAVORITOS SELECIONADOS --- */
 #selectedFavorites {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 colunas fixas */
+    grid-template-columns: repeat(3, 1fr); 
     gap: 1rem;
-    min-height: 800px; /* Garante altura mesmo vazio */
+    min-height: 200px; 
     align-items: start;
+    flex: 1;
+    overflow-y: auto;
 }
 
-/* Card do Favorito Selecionado */
 #selectedFavorites .anime-item-wrapper {
     position: relative;
     background-color: var(--bg-primary);
-    padding: 0; /* Remove padding interno do wrapper */
+    padding: 0;
     border-radius: 0.75rem;
     overflow: hidden;
     transition: transform 0.2s;
@@ -290,7 +222,7 @@
 
 #selectedFavorites .anime-image-display {
     width: 100%;
-    height: 600px; /* Altura fixa para alinhar */
+    height: 450px; /* Altura fixa para alinhar */
     object-fit: cover;
     border-radius: 0; /* Imagem preenche o card */
     margin-bottom: 0;
@@ -315,7 +247,6 @@
     text-overflow: ellipsis;
 }
 
-/* Botão de Remover (X) */
 #selectedFavorites button {
     position: absolute;
     top: 5px;
@@ -370,7 +301,7 @@
     text-align: center;
     cursor: pointer;
     transition: all 0.2s;
-    opacity: 0.5; /* Bloqueado por padrão */
+    opacity: 0.5; 
     position: relative;
     display: flex;
     flex-direction: column;
@@ -421,16 +352,13 @@
 
 /* 2. O Emblema Grande (No Modal de Seleção) */
 .badge-icon-img {
-    width: 4.5rem;      /* Tamanho maior na grid de seleção */
+    width: 4.5rem;      
     height: 4.5rem;
     object-fit: contain;
     margin-bottom: 0.5rem;
     transition: all 0.3s ease;
 }
 
-/* Efeito Visual: Bloqueado vs Desbloqueado */
-
-/* Se bloqueado: Imagem fica preto e branco e transparente */
 .badge-item:not(.unlocked) .badge-icon-img {
     filter: grayscale(100%);
     opacity: 0.4;
@@ -447,4 +375,113 @@
 .badge-item.selected .badge-icon-img {
     transform: scale(1.1);
     filter: drop-shadow(0 0 8px rgba(150, 30, 242, 0.6));
+}
+.library-tabs {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+}
+
+.library-tab {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    border: 1px solid transparent;
+    padding: 0.5rem 1.2rem;
+    border-radius: 2rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.library-tab:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+.library-tab.active {
+    background: var(--text-accent);
+    color: white;
+    box-shadow: 0 4px 10px rgba(150, 30, 242, 0.3);
+    border-color: transparent;
+}
+@media (max-width: 768px) {
+    .profile-banner {
+        margin-bottom: 0; /* Remove margem inferior excessiva */
+        display: flex;
+        flex-direction: column;
+    }
+
+    .banner-image {
+        height: 180px;
+        -webkit-mask-image: none; 
+        mask-image: none;
+        border-radius: 0; 
+    }
+
+    .profile-details {
+        position: static; 
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        margin-top: -50px; 
+        padding: 0 1rem 2rem 1rem;
+        background-color: transparent;
+        left: 0;
+        right: 0;
+        bottom: auto;
+    }
+
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        border: 4px solid var(--bg-secondary); 
+        margin-bottom: 0.75rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    }
+
+    .profile-user-info {
+        width: 100%;
+        margin-bottom: 1rem;
+        text-shadow: none; 
+    }
+
+    #profileUsername {
+        color: var(--text-primary); 
+        font-size: 1.5rem;
+        margin-bottom: 0.25rem;
+    }
+
+    #profileStats {
+        justify-content: center;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+
+    #editProfileBtn {
+        width: 100%; 
+        max-width: 250px;
+    }
+    #selectedFavorites {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.5rem;
+    }
+    #selectedFavorites .anime-image-display {
+        height: 50vh;
+    }
+    #favoritesModal .modal-content {
+    max-width: 1200px;
+    height: 80vh; 
+    width: 95%;
+    display: flex;
+    flex-direction: column;
+    }
+    .favorites-cards {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 1rem;
+    }
 }
