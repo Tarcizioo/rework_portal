@@ -251,7 +251,7 @@ body {
         padding: 0;
         padding-bottom: 5rem !important;
         overflow-x: hidden;
-        z-index: 10;
+        z-index: 120;
     }
     .main-header, .carousel-section {
         padding-left: 1rem;

@@ -101,7 +101,6 @@
     transform: rotate(180deg);
 }
 
-/* Mobile Sidebar (para o menu hamburguer) */
 .mobile-sidebar-overlay {
     position: fixed;
     inset: 0;
