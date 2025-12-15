@@ -411,7 +411,7 @@
 }
 @media (max-width: 768px) {
     .profile-banner {
-        margin-bottom: 0; /* Remove margem inferior excessiva */
+        margin-bottom: 0;
         display: flex;
         flex-direction: column;
     }

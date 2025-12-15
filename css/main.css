@@ -9,6 +9,7 @@
 /* Pages */
 @import url("pages/_home.css");
 @import url("pages/_profile.css");
+@import url("pages/_catalog.css");
 body {
             font-family: 'Lexend', sans-serif;
             transition: background-color 0.3s, color 0.3s;

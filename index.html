@@ -26,11 +26,26 @@
                 </button>
             </div>
             <nav>
-                <a href="index.html" class="nav-link active"><i data-lucide="home" class="icon"></i><span>Home</span></a>
-                <a href="#" class="nav-link"><i data-lucide="bar-chart-2" class="icon"></i><span>Populares</span></a>
-                <a href="#" class="nav-link"><i data-lucide="calendar-clock" class="icon"></i><span>Lançamentos</span></a>
-                <a href="#" id="settingsLink" class="nav-link"><i data-lucide="settings" class="icon"></i><span>Configurações</span></a>
-                <a href="profile.html" class="nav-link"><i data-lucide="user" class="icon"></i><span>Perfil</span></a>
+                <a href="index.html" class="nav-link active">
+                    <i data-lucide="home" class="icon"></i>
+                    <span>Home</span>
+                </a>
+                <a href="catalog.html?type=top" class="nav-link">
+                    <i data-lucide="bar-chart-2" class="icon"></i>
+                    <span>Populares</span>
+                </a>
+                <a href="catalog.html?type=season" class="nav-link">
+                    <i data-lucide="calendar-clock" class="icon"></i>
+                    <span>Lançamentos</span>
+                </a>
+                <a href="#" id="settingsLink" class="nav-link">
+                    <i data-lucide="settings" class="icon"></i>
+                    <span>Configurações</span>
+                </a>
+                <a href="profile.html" class="nav-link">
+                    <i data-lucide="user" class="icon"></i>
+                    <span>Perfil</span>
+                </a>
             </nav>
             <div class="sidebar-logout">
                 <a href="#" class="nav-link">
@@ -59,7 +74,7 @@
             <section class="carousel-section">
                 <div class="carousel-section-header">
                     <h2 class="carousel-section-title">Animes Populares</h2>
-                    <a href="#" class="see-more-link">ver mais ></a>
+                    <a href="catalog.html?type=top" class="see-more-link">ver mais ></a>
                 </div>
                 <div id="popularAnimesCarousel">
                     <p class="carousel-loading-message">Carregando...</p>
@@ -69,7 +84,7 @@
             <section class="carousel-section">
                 <div class="carousel-section-header">
                     <h2 class="carousel-section-title">Lançamentos da Temporada</h2>
-                    <a href="#" class="see-more-link">ver mais ></a>
+                    <a href="catalog.html?type=season" class="see-more-link">ver mais ></a>
                 </div>
                 <div id="mostRecentAnimesCarousel">
                     <p class="carousel-loading-message">Carregando...</p>
@@ -79,7 +94,7 @@
             <section class="carousel-section">
                 <div class="carousel-section-header">
                     <h2 class="carousel-section-title">Adrenalina Pura</h2>
-                    <a href="#" class="see-more-link">ver mais ></a>
+                    <a href="catalog.html?genre=1&label=Adrenalina%20Pura&order=members&filter=15" class="see-more-link">ver mais ></a>
                 </div>
                 <div id="actionAnimesCarousel">
                     <p class="carousel-loading-message">Carregando...</p>
@@ -89,7 +104,7 @@
             <section class="carousel-section">
                 <div class="carousel-section-header">
                     <h2 class="carousel-section-title">Para os Apaixonados</h2>
-                    <a href="#" class="see-more-link">ver mais ></a>
+                    <a href="catalog.html?genre=22&label=Para%20os%20Apaixonados&filter=1" class="see-more-link">ver mais ></a>
                 </div>
                 <div id="romanceAnimesCarousel">
                     <p class="carousel-loading-message">Carregando...</p>
@@ -99,7 +114,7 @@
             <section class="carousel-section">
                 <div class="carousel-section-header">
                     <h2 class="carousel-section-title">Dramas Emocionantes</h2>
-                    <a href="#" class="see-more-link">ver mais ></a>
+                    <a href="catalog.html?genre=8&label=Dramas%20Emocionantes&filter=1,2" class="see-more-link">ver mais ></a>
                 </div>
                 <div id="dramaAnimesCarousel">
                     <p class="carousel-loading-message">Carregando...</p>

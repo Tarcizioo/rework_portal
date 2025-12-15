@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo - Portal</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://unpkg.com/lucide@0.378.0/dist/umd/lucide.min.js" defer></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Lexend:wght@100..900&display=swap" rel="stylesheet">
+</head>
+<body class="dark-theme">
+
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Portal</div>
+                <button id="toggleSidebarBtn" class="toggle-sidebar-btn">
+                    <i data-lucide="chevron-left" class="icon"></i>
+                </button>
+            </div>
+            <nav>
+                <a href="index.html" class="nav-link"><i data-lucide="home" class="icon"></i><span>Home</span></a>
+                <a href="catalog.html?type=top" class="nav-link"><i data-lucide="bar-chart-2" class="icon"></i><span>Populares</span></a>
+                <a href="catalog.html?type=season" class="nav-link"><i data-lucide="calendar-clock" class="icon"></i><span>Lançamentos</span></a>
+                <a href="#" id="settingsLink" class="nav-link"><i data-lucide="settings" class="icon"></i><span>Configurações</span></a>
+                <a href="profile.html" class="nav-link"><i data-lucide="user" class="icon"></i><span>Perfil</span></a>
+            </nav>
+            <div class="sidebar-logout">
+                <a href="#" class="nav-link logout-link"><i data-lucide="log-out" class="icon"></i><span>Sair</span></a>
+            </div>
+        </aside>
+
+        <main class="main-content" style="padding: 2.5rem;">
+            <header class="catalog-header">
+                <h1 id="pageTitle" class="catalog-title">Carregando...</h1>
+                <p id="pageSubtitle" class="catalog-subtitle">Explorar catálogo completo</p>
+            </header>
+
+            <div id="catalogGrid" class="catalog-grid">
+                </div>
+
+            <div id="loadingSentinel">
+                <div class="loading-spinner"></div>
+            </div>
+        </main>
+    </div>
+
+    <div id="animeDetailsModal" class="modal-overlay hidden">
+        <div class="modal-content anime-details-modal">
+            <div class="modal-header">
+                <h2 id="animeDetailsModalTitle" class="modal-title">Título</h2>
+                <button id="closeAnimeDetailsModal" class="modal-close-button"><i data-lucide="x" class="icon"></i></button>
+            </div>
+            <div class="anime-details-body">
+                <div class="anime-details-sidebar">
+                    <img id="animeDetailsModalImage" class="anime-details-modal-image" alt="Poster">
+                    <div id="userAnimeActions" class="user-actions hidden">
+                        <div class="form-group" style="margin-bottom:0"><label>Status</label><div class="action-input-container"><select id="animeStatusSelect"><option value="plan_to_watch">Planejo Assistir</option><option value="watching">Assistindo</option><option value="completed">Completo</option><option value="dropped">Desisti</option></select></div></div>
+                        <div class="actions-grid" style="display:flex;flex-direction:column;gap:1rem"><div class="form-group" style="margin-bottom:0"><label>Progresso</label><div class="action-input-container"><input type="number" id="episodesInput" min="0"><span class="input-suffix">/ <span id="episodesTotalDisplay">?</span></span></div></div><div class="form-group" style="margin-bottom:0"><label>Nota</label><div class="action-input-container"><i data-lucide="star" class="score-icon"></i><input type="number" id="animeScoreInput" min="0" max="10" step="0.5"></div></div></div>
+                        <button id="saveToLibraryBtn">Salvar Alterações</button>
+                    </div>
+                    <div id="loginWarning" class="hidden" style="text-align:center;padding:1rem;color:var(--text-accent)">Faça login para salvar!</div>
+                </div>
+                <div class="anime-details-content">
+                    <div class="anime-meta-grid"><div class="meta-item"><strong>Nota</strong><span id="animeDetailsModalScore">-</span></div><div class="meta-item"><strong>Ranking</strong><span id="animeDetailsModalRank"># -</span></div><div class="meta-item"><strong>Temporada</strong><span id="animeDetailsModalSeason">-</span></div><div class="meta-item"><strong>Membros</strong><span id="animeDetailsModalUsers">-</span></div></div>
+                    <div id="animeDetailsModalGenres" class="tags"></div>
+                    <div class="modal-tabs"><button id="tabSynopsis" class="modal-tab active">Sinopse</button><button id="tabTrailer" class="modal-tab">Trailer</button></div>
+                    <div id="animeSynopsisArea" class="synopsis-area content-tab active"></div><div id="animeTrailerArea" class="trailer-area content-tab hidden"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="settingsModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header"><h3 class="modal-title">Configurações</h3><button id="closeSettingsModal" class="modal-close-button"><i data-lucide="x" class="icon"></i></button></div>
+            <div class="form-group"><label>Mudar Tema:</label><select id="themeSwitcher" class="form-select"><option value="dark">Escuro</option><option value="light">Claro</option></select></div>
+            <div class="modal-actions"><button id="saveSettings" class="button button-accent">Salvar</button></div>
+        </div>
+    </div>
+
+    <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay hidden">
+        <aside id="mobileSidebar" class="mobile-sidebar">
+             <div class="mobile-sidebar-header"><div class="sidebar-title">Portal</div><button id="closeMobileSidebar" class="mobile-sidebar-close-button"><i data-lucide="x" class="icon"></i></button></div>
+            <nav>
+                 <a href="index.html" class="nav-link"><i data-lucide="home" class="icon"></i><span>Home</span></a>
+                 <a href="catalog.html?type=top" class="nav-link"><i data-lucide="bar-chart-2" class="icon"></i><span>Populares</span></a>
+                 <a href="catalog.html?type=season" class="nav-link"><i data-lucide="calendar-clock" class="icon"></i><span>Lançamentos</span></a>
+                 <a href="#" id="settingsLinkMobile" class="nav-link"><i data-lucide="settings" class="icon"></i><span>Configurações</span></a>
+                 <a href="profile.html" class="nav-link"><i data-lucide="user" class="icon"></i><span>Perfil</span></a>
+            </nav>
+        </aside>
+        <button id="mobileMenuButton" class="mobile-menu-button"><i data-lucide="menu" class="icon"></i></button>
+    </div>
+
+    <script type="module" src="js/catalog.js"></script>
+</body>
+</html>
