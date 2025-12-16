@@ -60,6 +60,9 @@
               <h2 id="profileUsername">Usuário
                 <span id="profileBadge" title="Emblema"></span>
               </h2>
+              <p id="profileBio" style="color: var(--text-secondary); font-size: 0.9rem; margin: 0.5rem 0 1rem 0; max-width: 600px; line-height: 1.4;">
+                  Sem bio ainda...
+              </p>
               <p id="profileStats" style="color: var(--text-accent); font-weight: 500;">...</p>
           </div>
           <button id="editProfileBtn" class="button button-accent">Editar Perfil</button>
@@ -117,6 +120,10 @@
           </div>
         </div>
         <div class="form-group">
+          <label>Sobre Mim (Bio)</label>
+          <textarea id="profileBioInput" class="form-input" rows="3" placeholder="Escreva algo sobre seus gostos..." style="padding: 0.75rem; resize: none;"></textarea>
+        </div>
+    <div class="form-group">
           <label>Avatar</label>
           <input type="file" id="profileAvatarInput" class="form-input" accept="image/*">
         </div>
