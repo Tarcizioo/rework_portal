@@ -1,4 +1,3 @@
-// js/profile.js
 import { auth, db } from "./firebase-config.js";
 import { doc, getDoc, setDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -85,7 +84,7 @@ async function renderProfileHeader() {
     }
 
     // Renderizar Emblema ao lado do nome
-if (badgeDisplay) {
+    if (badgeDisplay) {
         badgeDisplay.innerHTML = "";
         if (currentBadgeId) {
             const badgeConfig = BADGES_CONFIG.find(b => b.id === currentBadgeId);
@@ -104,6 +103,15 @@ async function renderLibraryAndStats() {
     let totalEpisodes = 0;
     let watchedCount = 0;
 
+    // Inicializa contadores para as abas
+    const counts = {
+        all: fullLibrary.length,
+        watching: 0,
+        completed: 0,
+        plan_to_watch: 0,
+        dropped: 0
+    };
+
     fullLibrary.forEach(anime => {
         const eps = parseInt(anime.watched_episodes) || 0;
         const dur = parseInt(anime.duration_minutes) || 24;
@@ -112,7 +120,15 @@ async function renderLibraryAndStats() {
         
         // Conta como "assistido" se tiver status 'completed' ou mais de 0 eps
         if (anime.status === 'completed' || eps > 0) watchedCount++;
+
+        // Incrementa o contador do status específico
+        if (counts.hasOwnProperty(anime.status)) {
+            counts[anime.status]++;
+        }
     });
+
+    // --- ATUALIZA AS ABAS COM OS NÚMEROS ---
+    updateTabCounts(counts);
 
     // Guardamos estatísticas globais para usar na checagem de emblemas
     window.userStats = {
@@ -129,6 +145,26 @@ async function renderLibraryAndStats() {
         if (typeof lucide !== 'undefined') lucide.createIcons();
     }
     filterAndRenderLibrary(document.querySelector('.library-tab.active')?.dataset.status || 'all');
+}
+
+// Nova função auxiliar para atualizar os textos dos botões
+function updateTabCounts(counts) {
+    const labels = {
+        all: "Todos",
+        watching: "Assistindo",
+        completed: "Completos",
+        plan_to_watch: "Planejo",
+        dropped: "Desistidos"
+    };
+
+    document.querySelectorAll('.library-tab').forEach(tab => {
+        const status = tab.dataset.status;
+        const count = counts[status] || 0;
+        const label = labels[status] || status; 
+        
+        // Atualiza o texto para incluir o número: Ex: "Assistindo (5)"
+        tab.textContent = `${label} (${count})`;
+    });
 }
 
 function filterAndRenderLibrary(status) {

@@ -26,7 +26,6 @@ function parseDuration(durationString) {
 function populateModalUI(anime) {
     document.getElementById('animeDetailsModalTitle').textContent = anime.title;
     document.getElementById('animeDetailsModalImage').src = anime.imageUrl;
-    
     document.getElementById('animeDetailsModalScore').textContent = anime.score || '-';
     document.getElementById('animeDetailsModalRank').textContent = anime.rank ? `#${anime.rank}` : '-';
     document.getElementById('animeDetailsModalSeason').textContent = anime.season || '-';
@@ -98,7 +97,9 @@ export async function openAnimeDetailsModal(anime) {
                     score: freshData.score,
                     episodes: freshData.episodes,
                     duration: freshData.duration,
-                    durationParsed: parseDuration(freshData.duration)
+                    durationParsed: parseDuration(freshData.duration),
+                    season: freshData.season ? `${freshData.season} ${freshData.year || ''}` : null,
+                    genres: freshData.genres ? freshData.genres.map(g => g.name).join(', ') : "",
                 };
                 populateModalUI(currentModalAnime);
                 const totalDisplay = document.getElementById('episodesTotalDisplay');
@@ -173,7 +174,6 @@ export function initModalListeners() {
     const actionsContainer = document.getElementById('userAnimeActions');
 
     // --- CRIAÇÃO DINÂMICA DO BOTÃO DE REMOVER ---
-    // Verifica se já existe, se não, cria e adiciona
     if (actionsContainer && !document.getElementById('deleteFromLibraryBtn')) {
         const deleteBtn = document.createElement('button');
         deleteBtn.id = 'deleteFromLibraryBtn';
@@ -251,6 +251,10 @@ export function initModalListeners() {
                     imageUrl: currentModalAnime.imageUrl,
                     total_episodes: currentModalAnime.episodes || 0,
                     duration_minutes: durationVal,
+                    season: currentModalAnime.season || "N/A",
+                    rank: currentModalAnime.rank || 0,
+                    score: currentModalAnime.score || 0,
+                    genres: currentModalAnime.genres || "",
                     status: status,
                     watched_episodes: watched,
                     personal_score: scoreVal,
