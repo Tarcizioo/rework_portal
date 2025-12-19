@@ -174,12 +174,13 @@ body {
     position: relative;
     padding: 0.5rem;
     cursor: pointer;
-    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     border-radius: 0.75rem;
 }
 
 .anime-item-wrapper:hover {
-    transform: translateY(-5px) scale(1.02); /* Levanta levemente */
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px -10px var(--text-accent);
 }
 
 /* Imagem do Card */
